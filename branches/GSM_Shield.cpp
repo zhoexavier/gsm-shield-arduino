@@ -2244,13 +2244,11 @@ NEW TDGINO FUNCTION
 ***********************************************************/
 
 
-/******************	****************************************
+/**********************************************************
 Function to enable or disable echo
 Echo(1)   enable echo mode
 Echo(0)   disable echo mode
 **********************************************************/
-
-
 
 void GSM::Echo(byte state)
 {
@@ -2268,4 +2266,47 @@ void GSM::Echo(byte state)
 	}
 }
 
+/**********************************************************
+GPRS FUNCTION
+***********************************************************/
 
+
+/**********************************************************
+Function to set APN and eventually username and password
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+int GSM::SetAPN(char *apn, char *user, char *pswd)
+{
+	char ret_val = -1;
+	if(CLS_FREE != GetCommLineStatus()) return (ret_val);
+	SetCommLineStatus(CLS_ATCMD);
+	mySerial.print("AT+CSTT=\"");
+	mySerial.print(apn);  
+	mySerial.print("\",\"");
+	mySerial.print(user);  
+	mySerial.print("\",\"");
+	mySerial.print(pswd);  
+	mySerial.print("\"\r");
+	// 5000 msec. for initial comm tmout
+	// 50 msec. for inter character timeout
+	switch (WaitResp(5000, 50, "OK")) {
+		case RX_TMOUT_ERR:
+		// response was not received in specific time
+		break;
+
+		case RX_FINISHED_STR_RECV:
+		// response is OK = has been written
+		ret_val = 1;
+		break;
+
+		case RX_FINISHED_STR_NOT_RECV:
+		// other response: e.g. ERROR
+		break;
+	}
+	
+	SetCommLineStatus(CLS_FREE);
+	return (ret_val);
+}

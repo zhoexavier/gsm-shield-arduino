@@ -220,7 +220,7 @@ class GSM
     // Phonebook's methods
     char GetPhoneNumber(byte position, char *phone_number);
     char WritePhoneNumber(byte position, char *phone_number);
-	char DelPhoneNumber(byte position);
+    char DelPhoneNumber(byte position);
     char ComparePhoneNumber(byte position, char *phone_number);
 
 
@@ -240,6 +240,10 @@ class GSM
 	
 	//echo
 	void Echo(byte state);
+
+	//GPRS Function
+	//Function to set APN, username and password for connection
+	int SetAPN(char *apn, char *user, char *pswd);
 
 
     // debug methods
