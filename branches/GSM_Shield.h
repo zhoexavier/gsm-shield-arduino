@@ -60,6 +60,9 @@
 #define STATUS_REGISTERED           2
 #define STATUS_USER_BUTTON_ENABLE   4
 
+// GPRS status
+#define CHECK_AND_OPEN    0
+#define CLOSE_AND_REOPEN  1
 
 
 
@@ -244,6 +247,9 @@ class GSM
 	//GPRS Function
 	//Function to set APN, username and password for connection
 	int SetAPN(char *apn, char *user, char *pswd);
+	char EnableGPRS(byte open_mode);
+	void SimpleRead();
+	void SimpleWrite(char *comm);
 
 
     // debug methods

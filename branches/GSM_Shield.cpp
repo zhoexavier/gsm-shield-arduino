@@ -2310,3 +2310,105 @@ int GSM::SetAPN(char *apn, char *user, char *pswd)
 	SetCommLineStatus(CLS_FREE);
 	return (ret_val);
 }
+
+/**********************************************************
+Function to start a GPRS connection
+
+open_mode: 
+        0 (= CHECK_AND_OPEN) - checks the current state of context
+                               and in case context has been already activated
+                               nothing else in made 
+
+        1 (= CLOSE_AND_REOPEN) - context is deactivated anyway and then activated again
+                               it was found during testing, that you may need to reset the module etc., 
+                               and in these cases, you may not be able to activate the GPRS context 
+                               unless you deactivate it first
+
+return: 
+        ERROR ret. val:
+        ---------------
+        -1 - comm. line is not free
+
+        OK ret val:
+        -----------
+        0 - GPRS context was disabled
+        1 - GPRS context was enabled
+
+
+an example of usage:
+
+        GSM gsm;
+        if (gsm.EnableGPRS(CHECK_AND_OPEN) == 1) {
+          // GPRS context was enabled, so we have IP address
+          // and we can communicate if necessary
+        }
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+char GSM::EnableGPRS(byte open_mode)
+{
+  char ret_val = -1;
+
+  if (CLS_FREE != GetCommLineStatus()) return (ret_val);
+  SetCommLineStatus(CLS_ATCMD);
+
+  if (open_mode == CHECK_AND_OPEN) {
+    // first try if the GPRS context has not been already initialized
+    ret_val = SendATCmdWaitResp("AT+CIICR=?", 1000, 100, "OK", 2);
+    if (ret_val == AT_RESP_OK) {
+      // context is not initialized => init the context
+      //Enable GPRS
+      ret_val = SendATCmdWaitResp("AT+CIICR", 10000, 1000, "OK", 1);
+      if (ret_val == AT_RESP_OK) {
+        // context was activated
+        ret_val = 1;
+      }
+      else ret_val = 0; // not activated
+    }
+    else ret_val = 1; // context has been already activated
+  }
+  else {
+    // CLOSE_AND_REOPEN mode
+    //disable GPRS context
+    ret_val = SendATCmdWaitResp("AT+CIPSHUT", 10000, 1000, "SHUT OK", 3);
+    if (ret_val == AT_RESP_OK) {
+      // context is dactivated
+      // => activate GPRS context again
+      ret_val = SendATCmdWaitResp("AT+CIICR", 10000, 1000, "OK", 1);
+      if (ret_val == AT_RESP_OK) {
+        // context was activated
+        ret_val = 1;
+      }
+      else ret_val = 0; // not activated
+    }
+    else ret_val = 0; // not activated
+  }
+
+  SetCommLineStatus(CLS_FREE);
+  return (ret_val);
+}
+
+/**********************************************************
+Functions to send command and read response in easy way
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+void GSM::SimpleWrite(char *comm)
+{
+	mySerial.println(comm);
+}
+
+void GSM::SimpleRead()
+{
+	char datain;
+	if(mySerial.available()>0){
+		datain=mySerial.read();
+		if(datain>0){
+			Serial.print(datain, BYTE);
+		}
+	}
+}
