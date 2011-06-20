@@ -250,6 +250,16 @@ class GSM
 	char EnableGPRS(byte open_mode);
 	void SimpleRead();
 	void SimpleWrite(char *comm);
+	char SendATCmdSaveResp(char const *AT_cmd_string,
+               uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
+               char *response_string,
+               byte no_of_attempts);
+	byte SaveStringReceived(char *save2string);
+	byte GetIP(char *ipstring);
+	char OpenSocket(char *socket_type, uint16_t remote_port, char* remote_addr);
+	byte SendData(char *data);
+        byte PublishIP(char *hostname, char *pwd64base, char*ip);
+	byte ReadAndSave(int& data);
 
 
     // debug methods
@@ -264,6 +274,7 @@ class GSM
 
   private:
     byte comm_line_status;
+
 
     // global status - bits are used for representation of states
     byte module_status;
