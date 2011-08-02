@@ -260,6 +260,9 @@ class GSM
 	byte SendData(char *data);
         byte PublishIP(char *hostname, char *pwd64base, char*ip);
 	byte ReadAndSave(int& data);
+	int Compare(char *ref_string, char *test_string);
+	int Isspace(char *string);
+	char* Search(char *ref_string, char *test_string);
 
 
     // debug methods

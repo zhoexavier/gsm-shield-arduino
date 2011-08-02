@@ -271,7 +271,7 @@ byte GSM::IsRxFinished(void)
 	#ifdef DEBUG_GSMRX
 		
 			DebugPrint("\r\nDEBUG: intercharacter", 0);			
-			Serial.print((unsigned long)(millis() - prev_time));	
+<			Serial.print((unsigned long)(millis() - prev_time));	
 			DebugPrint("\r\nDEBUG: interchar_tmout\r\n", 0);			
 			Serial.print(interchar_tmout);	
 			
@@ -2575,15 +2575,13 @@ an example of usage:
 //Proposed by martines.marco@gmail.com
 //Waiting for confirmation from boris.landoni@gmail.com
 
-char GSM::OpenSocket(char *socket_type, uint16_t remote_port, char* remote_addr)
+char GSM::OpenSocket(char *socket_type, uint16_t remote_port, char *remote_addr)
 {
   char ret_val = -1;
   char cmd[100];
   char tmp_str[10];
 
-  if (CLS_FREE != GetCommLineStatus()) return (ret_val);
   SetCommLineStatus(CLS_ATCMD);
-  // prepare command:  AT+CIPSTART=1,"IP","apn"
   strcpy(cmd, "AT+CIPSTART=");
   // add socket type
   strcat(cmd, "\""); // add characters "
@@ -2594,20 +2592,16 @@ char GSM::OpenSocket(char *socket_type, uint16_t remote_port, char* remote_addr)
   strcat(cmd, remote_addr);
   strcat(cmd, "\","); // add characters ",
   // add remote port
-  strcat(cmd, "\""); // add characters "
   strcat(cmd, itoa(remote_port, tmp_str, 10));
-  strcat(cmd, "\""); // add characters "
 
-
+  Serial.println(cmd);
   // send AT command and waits for the response "CONNECT" - max. 3 times
-  ret_val = SendATCmdWaitResp(cmd, 20000, 100, "CONNECT", 3);
+  ret_val = SendATCmdWaitResp(cmd, 20000, 100, "OK", 3);
   if (ret_val == AT_RESP_OK) {
     ret_val = 1;
-    SetCommLineStatus(CLS_DATA);
   }
   else {
     ret_val = 0;
-    SetCommLineStatus(CLS_FREE);
   }
   
   return (ret_val);
@@ -2629,6 +2623,7 @@ byte GSM::SendData(char *data)
   }
   return (ret_val);
 }
+
 
 /**********************************************************
 Publish IP by dyndns.com protocol
@@ -2699,4 +2694,40 @@ byte GSM::ReadAndSave(int& data)
 		ret_val=1;		
 	}
 	return(ret_val);
+}
+
+
+/**********************************************************
+Compare two strings
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+int GSM::Compare(char *ref_string, char *test_string)
+{	
+	int resp;
+	int len=strlen(test_string);
+	resp=strncmp(ref_string,test_string,len);
+	if (resp==0)
+		return 1;
+	else
+		return 0;
+}
+
+int GSM::Isspace(char *string)
+{
+	return(isspace((int)string)==1);
+}
+
+/**********************************************************
+Search substrings
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+char* GSM::Search(char *ref_string, char *test_string)
+{	
+	return strstr(ref_string,test_string);
 }
