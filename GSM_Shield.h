@@ -60,6 +60,9 @@
 #define STATUS_REGISTERED           2
 #define STATUS_USER_BUTTON_ENABLE   4
 
+// GPRS status
+#define CHECK_AND_OPEN    0
+#define CLOSE_AND_REOPEN  1
 
 
 
@@ -220,7 +223,7 @@ class GSM
     // Phonebook's methods
     char GetPhoneNumber(byte position, char *phone_number);
     char WritePhoneNumber(byte position, char *phone_number);
-	char DelPhoneNumber(byte position);
+    char DelPhoneNumber(byte position);
     char ComparePhoneNumber(byte position, char *phone_number);
 
 
@@ -241,6 +244,26 @@ class GSM
 	//echo
 	void Echo(byte state);
 
+	//GPRS Function
+	//Function to set APN, username and password for connection
+	int SetAPN(char *apn, char *user, char *pswd);
+	char EnableGPRS(byte open_mode);
+	void SimpleRead();
+	void SimpleWrite(char *comm);
+	char SendATCmdSaveResp(char const *AT_cmd_string,
+               uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
+               char *response_string,
+               byte no_of_attempts);
+	byte SaveStringReceived(char *save2string);
+	byte GetIP(char *ipstring);
+	char OpenSocket(char *socket_type, uint16_t remote_port, char* remote_addr);
+	byte SendData(char *data);
+        byte PublishIP(char *hostname, char *pwd64base, char*ip);
+	byte ReadAndSave(int& data);
+	int Compare(char *ref_string, char *test_string);
+	int Isspace(char *string);
+	char* Search(char *ref_string, char *test_string);
+
 
     // debug methods
 #ifdef DEBUG_LED_ENABLED
@@ -254,6 +277,7 @@ class GSM
 
   private:
     byte comm_line_status;
+
 
     // global status - bits are used for representation of states
     byte module_status;

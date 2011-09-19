@@ -271,7 +271,7 @@ byte GSM::IsRxFinished(void)
 	#ifdef DEBUG_GSMRX
 		
 			DebugPrint("\r\nDEBUG: intercharacter", 0);			
-			Serial.print((unsigned long)(millis() - prev_time));	
+<			Serial.print((unsigned long)(millis() - prev_time));	
 			DebugPrint("\r\nDEBUG: interchar_tmout\r\n", 0);			
 			Serial.print(interchar_tmout);	
 			
@@ -2244,13 +2244,11 @@ NEW TDGINO FUNCTION
 ***********************************************************/
 
 
-/******************	****************************************
+/**********************************************************
 Function to enable or disable echo
 Echo(1)   enable echo mode
 Echo(0)   disable echo mode
 **********************************************************/
-
-
 
 void GSM::Echo(byte state)
 {
@@ -2268,4 +2266,468 @@ void GSM::Echo(byte state)
 	}
 }
 
+/**********************************************************
+GPRS FUNCTION
+***********************************************************/
 
+
+/**********************************************************
+Function to set APN and eventually username and password
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+int GSM::SetAPN(char *apn, char *user, char *pswd)
+{
+	char ret_val = -1;
+	if(CLS_FREE != GetCommLineStatus()) return (ret_val);
+	SetCommLineStatus(CLS_ATCMD);
+	mySerial.print("AT+CSTT=\"");
+	mySerial.print(apn);  
+	mySerial.print("\",\"");
+	mySerial.print(user);  
+	mySerial.print("\",\"");
+	mySerial.print(pswd);  
+	mySerial.print("\"\r");
+	// 5000 msec. for initial comm tmout
+	// 50 msec. for inter character timeout
+	switch (WaitResp(5000, 50, "OK")) {
+		case RX_TMOUT_ERR:
+		// response was not received in specific time
+		break;
+
+		case RX_FINISHED_STR_RECV:
+		// response is OK = has been written
+		ret_val = 1;
+		break;
+
+		case RX_FINISHED_STR_NOT_RECV:
+		// other response: e.g. ERROR
+		break;
+	}
+	
+	SetCommLineStatus(CLS_FREE);
+	return (ret_val);
+}
+
+/**********************************************************
+Function to start a GPRS connection
+
+open_mode: 
+        0 (= CHECK_AND_OPEN) - checks the current state of context
+                               and in case context has been already activated
+                               nothing else in made 
+
+        1 (= CLOSE_AND_REOPEN) - context is deactivated anyway and then activated again
+                               it was found during testing, that you may need to reset the module etc., 
+                               and in these cases, you may not be able to activate the GPRS context 
+                               unless you deactivate it first
+
+return: 
+        ERROR ret. val:
+        ---------------
+        -1 - comm. line is not free
+
+        OK ret val:
+        -----------
+        0 - GPRS context was disabled
+        1 - GPRS context was enabled
+
+
+an example of usage:
+
+        GSM gsm;
+        if (gsm.EnableGPRS(CHECK_AND_OPEN) == 1) {
+          // GPRS context was enabled, so we have IP address
+          // and we can communicate if necessary
+        }
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+char GSM::EnableGPRS(byte open_mode)
+{
+  char ret_val = -1;
+
+  if (CLS_FREE != GetCommLineStatus()) return (ret_val);
+  SetCommLineStatus(CLS_ATCMD);
+
+  if (open_mode == CHECK_AND_OPEN) {
+    // first try if the GPRS context has not been already initialized
+    ret_val = SendATCmdWaitResp("AT+CIICR=?", 1000, 100, "OK", 2);
+    if (ret_val == AT_RESP_OK) {
+      // context is not initialized => init the context
+      //Enable GPRS
+      ret_val = SendATCmdWaitResp("AT+CIICR", 10000, 1000, "OK", 1);
+      if (ret_val == AT_RESP_OK) {
+        // context was activated
+        ret_val = 1;
+      }
+      else ret_val = 0; // not activated
+    }
+    else ret_val = 1; // context has been already activated
+  }
+  else {
+    // CLOSE_AND_REOPEN mode
+    //disable GPRS context
+    ret_val = SendATCmdWaitResp("AT+CIPSHUT", 10000, 1000, "SHUT OK", 3);
+    if (ret_val == AT_RESP_OK) {
+      // context is dactivated
+      // => activate GPRS context again
+      ret_val = SendATCmdWaitResp("AT+CIICR", 10000, 1000, "OK", 1);
+      if (ret_val == AT_RESP_OK) {
+        // context was activated
+        ret_val = 1;
+      }
+      else ret_val = 0; // not activated
+    }
+    else ret_val = 0; // not activated
+  }
+
+  SetCommLineStatus(CLS_FREE);
+  return (ret_val);
+}
+
+/**********************************************************
+Functions to send command and read response in easy way
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+void GSM::SimpleWrite(char *comm)
+{
+	mySerial.println(comm);
+}
+
+void GSM::SimpleRead()
+{
+	char datain;
+	if(mySerial.available()>0){
+		datain=mySerial.read();
+		if(datain>0){
+			Serial.print(datain, BYTE);
+		}
+	}
+}
+
+
+/**********************************************************
+Method sends AT command and save response
+
+return: 
+      AT_RESP_ERR_NO_RESP = -1,   // no response received
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+char GSM::SendATCmdSaveResp(char const *AT_cmd_string,
+                uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
+                char *response_string, byte no_of_attempts)
+{
+  byte status;
+  char ret_val = AT_RESP_ERR_NO_RESP;
+  byte i;
+
+  for (i = 0; i < no_of_attempts; i++) {
+    // delay 500 msec. before sending next repeated AT command 
+    // so if we have no_of_attempts=1 tmout will not occurred
+    if (i > 0) delay(500); 
+
+    mySerial.println(AT_cmd_string);
+    status = WaitResp(start_comm_tmout, max_interchar_tmout); 
+    if (status == RX_FINISHED) {
+      // something was received but what was received?
+      // ---------------------------------------------
+      if(SaveStringReceived(response_string)) {
+        ret_val = AT_RESP_OK;      
+        break;  // response is OK => finish
+      }
+      else ret_val = AT_RESP_ERR_DIF_RESP;
+    }
+    else {
+      // nothing was received
+      // --------------------
+      ret_val = AT_RESP_ERR_NO_RESP;
+    }
+    
+  }
+
+
+  return (ret_val);
+}
+
+
+/**********************************************************
+Method saves received bytes
+
+save2string - pointer to the string wich should have response
+
+return: 0 - string was NOT saved
+        1 - string was saved
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+byte GSM::SaveStringReceived(char *save2string)
+{
+  char *ch;
+  byte ret_val = 0;
+
+  if(comm_buf_len) {
+  /*
+		#ifdef DEBUG_GSMRX
+			DebugPrint("DEBUG: Compare the string: \r\n", 0);
+			for (int i=0; i<comm_buf_len; i++){
+				Serial.print(byte(comm_buf[i]));	
+			}
+			
+			DebugPrint("\r\nDEBUG: with the string: \r\n", 0);
+			Serial.print(compare_string);	
+			DebugPrint("\r\n", 0);
+		#endif
+	*/
+    
+    ch = strcpy(save2string,(char *)comm_buf);
+    if (ch != NULL) {
+      ret_val = 1;
+	  /*#ifdef DEBUG_PRINT
+		DebugPrint("\r\nDEBUG: expected string was received\r\n", 0);
+	  #endif
+	  */
+    }
+	else
+	{
+	  /*#ifdef DEBUG_PRINT
+
+		DebugPrint("\r\nDEBUG: expected string was NOT received\r\n", 0);
+	  #endif
+	  */
+	}
+  }
+
+  return (ret_val);
+}
+
+/**********************************************************
+Get IP address
+
+ipresp - pointer to the string wich should have IP response
+
+return: 0 - IP was NOT saved
+        1 - IP was saved
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+byte GSM::GetIP(char *ipresp)
+{
+  char iptemp[]="000.000.000.000.000";
+  int iplen=0;
+  byte ret_val=0;
+  ret_val=SendATCmdSaveResp("AT+CIFSR", 10000, 1000, iptemp, 3);
+  if(ret_val==1){  
+	iplen=strlen(iptemp);
+        for (int i=2; i<iplen-1; i++){
+		ipresp[i-2]=iptemp[i];
+	}
+  }
+  return (ret_val);
+}
+
+
+/**********************************************************
+Method opens the socket
+
+<socket type> - socket protocol type
+                0 - TCP
+                1 - UDP
+<remote port> - remote host port to be opened
+                0..65535 - port number
+<remote addr> - address of the remote host, string type. 
+              This parameter can be either:
+              - any valid IP address in the format: xxx.xxx.xxx.xxx
+              - any host name to be solved with a DNS query in the format: <host
+              name>
+
+return: 
+        ERROR ret. val:
+        ---------------
+        -1 - comm. line is not free
+
+        OK ret val:
+        -----------
+        0 - socket was not opened
+        1 - socket was successfully opened
+
+
+an example of usage:
+
+        GSM gsm;
+        gsm.OpenSocket(TCP, 80, "www.google.com"); 
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+char GSM::OpenSocket(char *socket_type, uint16_t remote_port, char *remote_addr)
+{
+  char ret_val = -1;
+  char cmd[100];
+  char tmp_str[10];
+
+  SetCommLineStatus(CLS_ATCMD);
+  strcpy(cmd, "AT+CIPSTART=");
+  // add socket type
+  strcat(cmd, "\""); // add characters "
+  strcat(cmd, socket_type);
+  strcat(cmd, "\","); // add character ",
+  // add remote addr
+  strcat(cmd, "\""); // add characters "
+  strcat(cmd, remote_addr);
+  strcat(cmd, "\","); // add characters ",
+  // add remote port
+  strcat(cmd, itoa(remote_port, tmp_str, 10));
+
+  Serial.println(cmd);
+  // send AT command and waits for the response "CONNECT" - max. 3 times
+  ret_val = SendATCmdWaitResp(cmd, 20000, 100, "OK", 3);
+  if (ret_val == AT_RESP_OK) {
+    ret_val = 1;
+  }
+  else {
+    ret_val = 0;
+  }
+  
+  return (ret_val);
+}
+
+/**********************************************************
+Send data by socket connection
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+byte GSM::SendData(char *data)
+{
+  int ret_val=0;
+  ret_val=SendATCmdWaitResp("AT+CIPSEND", 10000, 1000,">", 3);
+  if(ret_val==1){  
+	SimpleWrite(data);
+  }
+  return (ret_val);
+}
+
+
+/**********************************************************
+Publish IP by dyndns.com protocol
+
+<hostname>	the hostname (e.g. example.dyndns-ip.com
+
+<pwd64base>	the phrase username:password base64 encoded
+
+<ip>		the IP wich should be published
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+byte GSM::PublishIP(char *hostname, char *pwd64base, char*ip)
+{
+  SendATCmdWaitResp("AT+CIPSEND", 10000, 1000,">", 3);
+  delay(1000);
+
+  int ret_val=0;
+  char cmd1[150];
+  char cmd2[50];
+  char cmd3[2];
+  cmd3[0]=0x1a;
+  cmd3[1]='\0';
+
+  strcpy(cmd1, "GET /nic/update?hostname=");
+  strcat(cmd1, hostname);
+  strcat(cmd1, "&myip=");
+  strcat(cmd1, ip);
+  strcat(cmd1, " HTTP/1.0");
+  
+  strcpy(cmd2, "Authorization: Basic ");
+  strcat(cmd2, pwd64base);
+
+
+  SimpleWrite(cmd1);
+  SimpleWrite("Host: members.dyndns.org");
+  SimpleWrite(cmd2);
+  SimpleWrite("User-Agent: GSM-Shield for Arduino");
+  SimpleWrite("");
+
+  SimpleWrite(cmd3); 
+}
+
+
+
+/**********************************************************
+Read and save the byte as int
+
+How use it:
+
+	char	A;
+	int	B;
+	if(ReadAndSave(B)==1)
+		A=(char)B;
+
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+byte GSM::ReadAndSave(int& data)
+{	
+	byte ret_val=0;
+	if(mySerial.available()>0){
+		data=mySerial.read();
+		ret_val=1;		
+	}
+	return(ret_val);
+}
+
+
+/**********************************************************
+Compare two strings
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+int GSM::Compare(char *ref_string, char *test_string)
+{	
+	int resp;
+	int len=strlen(test_string);
+	resp=strncmp(ref_string,test_string,len);
+	if (resp==0)
+		return 1;
+	else
+		return 0;
+}
+
+int GSM::Isspace(char *string)
+{
+	return(isspace((int)string)==1);
+}
+
+/**********************************************************
+Search substrings
+**********************************************************/
+
+//Proposed by martines.marco@gmail.com
+//Waiting for confirmation from boris.landoni@gmail.com
+
+char* GSM::Search(char *ref_string, char *test_string)
+{	
+	return strstr(ref_string,test_string);
+}
