@@ -4,6 +4,15 @@
  http://www.creativecommons.org/licenses/by-sa/3.0/
  www.hwkitchen.com
 */  
+
+
+/*
+**********************************************************************
+Comments:
+-How we can have the restart function?
+**********************************************************************
+*/
+
 #include "WProgram.h"
 #include "NewSoftSerial.h"
 #include "GSM_Shield.h"
