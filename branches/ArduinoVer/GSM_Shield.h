@@ -167,7 +167,7 @@ class GSM
 
 
     // turns on GSM module
-    void TurnOn(long baud_rate);
+    void begin(long baud_rate);
     // sends some initialization parameters
     void InitParam (byte group);
     // enables DTMF decoder

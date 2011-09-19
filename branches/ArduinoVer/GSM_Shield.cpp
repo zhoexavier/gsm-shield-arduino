@@ -497,7 +497,7 @@ byte GSM::IsInitialized(void)
   - if YES nothing is made 
   - if NO GSM module is turned on 
 **********************************************************/
-void GSM::TurnOn(long baud_rate)
+void GSM::begin(long baud_rate)
 {
   SetCommLineStatus(CLS_ATCMD);
   mySerial.begin(baud_rate);
