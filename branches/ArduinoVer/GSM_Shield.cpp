@@ -16,6 +16,13 @@ Comments:
 #include "WProgram.h"
 #include "NewSoftSerial.h"
 #include "GSM_Shield.h"
+#include "Streaming.h"
+
+#define _GSM_CONNECTION_TOUT_ 5
+#define _TCP_CONNECTION_TOUT_ 20
+#define _GSM_DATA_TOUT_ 5
+#define _GSM_TXPIN_ 2
+#define _GSM_RXPIN_ 3
 
 extern "C" {
   #include <string.h>
@@ -24,7 +31,7 @@ extern "C" {
 
 NewSoftSerial mySerial(4, 5);  //rx, tx
 
-
+GSM gsm;
 
 #ifdef DEBUG_LED_ENABLED
   int DEBUG_LED = 25;                // LED connected to digital pin 25
@@ -103,8 +110,7 @@ int GSM::LibVer(void)
 /**********************************************************
   Constructor definition
 ***********************************************************/
-
-GSM::GSM(void)
+GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE)
 {
   // set some GSM pins as inputs, some as outputs
   pinMode(GSM_ON, OUTPUT);               // sets pin 5 as output
@@ -506,7 +512,7 @@ byte GSM::IsInitialized(void)
   - if YES nothing is made 
   - if NO GSM module is turned on 
 **********************************************************/
-void GSM::begin(long baud_rate)
+int GSM::begin(long baud_rate)
 {
   SetCommLineStatus(CLS_ATCMD);
   mySerial.begin(baud_rate);
@@ -665,6 +671,9 @@ void GSM::begin(long baud_rate)
 
   // send collection of first initialization parameters for the GSM module    
   InitParam(PARAM_SET_0);
+  InitParam(PARAM_SET_1);//configure the module  
+  Echo(0);               //enable AT echo 
+  return(0);
 }
 
 
@@ -2739,4 +2748,126 @@ Search substrings
 char* GSM::Search(char *ref_string, char *test_string)
 {	
 	return strstr(ref_string,test_string);
+}
+
+/**********************************************************
+Arduino Shield compatible functions
+**********************************************************/
+int GSM::attachGPRS(char *domain, char *user, char *pswd){
+	SetAPN(domain,user,pswd);
+	delay(3000);
+	if(EnableGPRS(0)==1){
+		delay(3000);
+		return(0);
+	}
+	else
+		return(1);
+}
+
+int GSM::deattachGPRS(char *domain, char *user, char *pswd){
+	SendATCmdWaitResp("AT+CIPSHUT", 1000, 1000,"OK", 3);
+	delay(1000);
+	return(0);
+}
+
+int GSM::write(const uint8_t* buffer, size_t sz){
+   if((getStatus() != TCPCONNECTEDSERVER)&&(getStatus() != TCPCONNECTEDCLIENT))
+    return 0;
+    
+   if(sz>1460)
+     return 0;
+  
+  _tf.setTimeout(_GSM_DATA_TOUT_);
+
+  _cell.flush();
+    
+  for(int i=0;i<sz;i++)
+    _cell << _BYTE(buffer[i]);
+  
+  //Not response for a write.
+  /*if(_tf.find("OK"))
+    return sz;
+  else
+    return 0;*/
+    
+  return sz;  
+}
+
+int GSM::connectTCP(const char* server, int port){
+  _tf.setTimeout(_TCP_CONNECTION_TOUT_);
+
+  //Status = ATTACHED.
+  if (getStatus()!=ATTACHED)
+    return 0;
+
+  _cell.flush();
+  
+  //Visit the remote TCP server.
+  _cell << "AT+CIPSTART=\"TCP\",\"" << server << "\"," << port <<  _BYTE(cr) << endl;
+  
+   //Expect "CONNECT". 
+  if(_tf.find("CONNECT"))
+  {
+    setStatus(TCPCONNECTEDCLIENT); 
+    delay(200);
+    return 1;
+  }
+  else 
+    return 0;
+}
+
+int GSM::disconnectTCP()
+{
+  //Status = TCPCONNECTEDCLIENT or TCPCONNECTEDSERVER.
+  if ((getStatus()!=TCPCONNECTEDCLIENT)&&(getStatus()!=TCPCONNECTEDSERVER))
+     return 0;
+
+  _tf.setTimeout(_GSM_CONNECTION_TOUT_);
+
+
+  _cell.flush();
+
+  //Switch to AT mode.
+  _cell << "+++" << endl;
+  
+  delay(200);
+  
+  //Close TCP client and deact.
+  _cell << "AT+CIPCLOSE" << endl;
+
+  //If remote server close connection AT+QICLOSE generate ERROR
+  if(_tf.find("OK"))
+  {
+    if(getStatus()==TCPCONNECTEDCLIENT)
+      setStatus(ATTACHED);
+    else
+      setStatus(TCPSERVERWAIT);
+    return 1;
+  }
+  setStatus(ERROR);
+  
+  return 0;    
+ 
+    return 1;
+}
+
+int GSM::read(char* result, int resultlength){
+
+  // Or maybe do it with AT+QIRD
+
+  int charget;
+  _tf.setTimeout(3);
+  // Not well. This way we read whatever comes in one second. If a CLOSED 
+  // comes, we have spent a lot of time
+  charget=_tf.getString("","",result, resultlength);
+  /*if(strtok(result, "CLOSED")) // whatever chain the Q10 returns...
+  {
+    // TODO: use strtok to delete from the chain everything from CLOSED
+    if(getStatus()==TCPCONNECTEDCLIENT)
+      setStatus(ATTACHED);
+    else
+      setStatus(TCPSERVERWAIT);
+  }  */
+  
+  return charget;
 }

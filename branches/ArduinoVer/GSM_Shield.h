@@ -8,8 +8,14 @@
 #define __GSM_Shield
 
 #include "WProgram.h"
-#include "NewSoftSerial.h"
+#include <NewSoftSerial.h>
+#include "Streaming.h"
+#include "WideTextFinder.h"
+#include <inttypes.h>
 
+#define ctrlz 26 //Ascii character for ctr+z. End of a SMS.
+#define cr    13 //Ascii character for carriage return. 
+#define lf    10 //Ascii character for line feed.
 #define GSM_LIB_VERSION 101 // library version X.YY (e.g. 1.00)
 
 // if defined - debug print is enabled with possibility to print out 
@@ -152,6 +158,18 @@ enum getsms_ret_val_enum
 class GSM
 {
   public:
+     enum GSM_st_e { ERROR, IDLE, READY, ATTACHED, TCPSERVERWAIT, TCPCONNECTEDSERVER, TCPCONNECTEDCLIENT };
+
+  private:
+    int _status;
+    
+  protected:
+    NewSoftSerial _cell;
+    WideTextFinder _tf;
+    inline void setStatus(GSM_st_e status) { _status = status; }
+
+  public:
+
     byte comm_buf[COMM_BUF_LEN+1];  // communication buffer +1 for 0x00 termination
 
     // library version
@@ -167,7 +185,7 @@ class GSM
 
 
     // turns on GSM module
-    void begin(long baud_rate);
+    int begin(long baud_rate);
     // sends some initialization parameters
     void InitParam (byte group);
     // enables DTMF decoder
@@ -264,6 +282,14 @@ class GSM
 	int Isspace(char *string);
 	char* Search(char *ref_string, char *test_string);
 
+	//Function to adapt to Arduino Shield
+	int attachGPRS(char *domain, char *user, char *pswd);
+	int deattachGPRS(char *domain, char *user, char *pswd);
+	int write(const uint8_t* buffer, size_t sz);
+	int connectTCP(const char* server, int port);
+	int disconnectTCP();
+	int read(char* result, int resultlength);
+ 	inline int getStatus(){   return _status; };
 
     // debug methods
 #ifdef DEBUG_LED_ENABLED
@@ -296,4 +322,7 @@ class GSM
 
     char InitSMSMemory(void);
 };
+
+extern GSM gsm;
+
 #endif
