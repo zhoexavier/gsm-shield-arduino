@@ -2871,3 +2871,53 @@ int GSM::read(char* result, int resultlength){
   
   return charget;
 }
+
+int GSM::connectTCPServer(int port)
+{
+  if (getStatus()!=ATTACHED)
+     return 0;
+
+  _tf.setTimeout(_GSM_CONNECTION_TOUT_);
+
+  _cell.flush();
+
+  // Set port
+  _cell << "AT+QILPORT=\"TCP\"," << port << endl;
+  if(!_tf.find("OK")) // Should we leave Status in ERROR?
+    return 0;
+    
+  delay(200);  
+  
+  //Read Local Port, if not read, server get error.
+  _cell << "AT+QILOCIP" << endl;
+    
+  delay(500);  
+  
+  // Open server
+  _cell << "AT+QISERVER" << endl;
+  if(_tf.find("OK"))
+  {
+    setStatus(TCPSERVERWAIT);
+    return 1;
+  }
+  else
+    return 0;
+}
+
+boolean GSM::connectedClient()
+{
+  if (getStatus()!=TCPSERVERWAIT)
+     return 0;
+ 
+  // Alternative: AT+QISTAT, although it may be necessary to call an AT 
+  // command every second,which is not wise
+  _tf.setTimeout(1);
+  if(_tf.find("CONNECT")) 
+  {
+    setStatus(TCPCONNECTEDSERVER);
+    return true;
+  }
+  else
+    return false;
+ }
+

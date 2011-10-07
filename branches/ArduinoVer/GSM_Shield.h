@@ -290,6 +290,8 @@ class GSM
 	int disconnectTCP();
 	int read(char* result, int resultlength);
  	inline int getStatus(){   return _status; };
+	int connectTCPServer(int port);
+	boolean connectedClient();
 
     // debug methods
 #ifdef DEBUG_LED_ENABLED
