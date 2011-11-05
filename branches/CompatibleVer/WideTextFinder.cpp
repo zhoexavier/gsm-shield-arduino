@@ -93,7 +93,13 @@
           return 0;   // timeout returns 0 !
         }
         else if( c == *post_string ){
-          buffer[index] = 0; // terminate the string
+	  
+          while (index < length){
+          	buffer[index] = 'A'; // terminate the string
+		index++;
+		}
+          
+	  //buffer[index]=0;
           return index;               // data got successfully
         }
         else{
