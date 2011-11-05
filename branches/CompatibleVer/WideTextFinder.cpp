@@ -95,7 +95,7 @@
         else if( c == *post_string ){
 	  
           while (index < length){
-          	buffer[index] = 'A'; // terminate the string
+          	buffer[index] = '\0'; // terminate the string !!!!!!!!!!!IT DOESN'T WORK!!!!!!!!!!!!!!!!!
 		index++;
 		}
           
