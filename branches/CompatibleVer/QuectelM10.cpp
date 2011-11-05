@@ -371,8 +371,17 @@ boolean QuectelM10::connectedClient()
    _cell << "AT+CIPSTATUS" << "\r";
   // Alternative: AT+QISTAT, although it may be necessary to call an AT 
   // command every second,which is not wise
+  /*
+  switch(WaitResp(1000, 200, "OK")){
+	case RX_TMOUT_ERR: 
+		return 0;
+	break;
+	case RX_FINISHED_STR_NOT_RECV: 
+		return 0; 
+	break;
+  }*/
   _tf.setTimeout(1);
-  if(_tf.find("CONNECT")) 
+  if(_tf.find("CONNECT OK")) 
   {
     setStatus(TCPCONNECTEDSERVER);
     return true;
@@ -415,8 +424,8 @@ int QuectelM10::read(char* result, int resultlength)
   _tf.setTimeout(3);
   // Not well. This way we read whatever comes in one second. If a CLOSED 
   // comes, we have spent a lot of time
+    //charget=_tf.getString("",'\0',result, resultlength);
     charget=_tf.getString("","",result, resultlength);
-
   /*if(strtok(result, "CLOSED")) // whatever chain the Q10 returns...
   {
     // TODO: use strtok to delete from the chain everything from CLOSED
