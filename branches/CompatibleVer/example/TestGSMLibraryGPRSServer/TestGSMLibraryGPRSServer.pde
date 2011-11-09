@@ -1,16 +1,12 @@
 #include "QuectelM10.h"
 #include <NewSoftSerial.h>
 #include "inetGSM.h"
-/*#include "LOG.h"
- 
- #define __LOG_LEVEL 5
- LOG logme(__LOG_LEVEL);
- */
-/*
- * We should put here some copyright stuff.
- *
- * This program is developed just to test-develop the Arduino-TID-GSM libraries.
- */
+
+//GSM Shield for Arduino
+//www.open-electronics.org
+//this code is based on the example of Arduino Labs.
+
+//Simple sketch to start a connection as server.
 
 InetGSM inet;
 char msg[100];
@@ -24,50 +20,55 @@ void setup()
   //Serial connection.
   Serial.begin(9600);
   Serial.println("GSM Shield testing.");
-  //Start configuration.
+  //Start configuration of shield with baudrate.
+  //For http uses is raccomanded to use 4800 or slower.
   if (gsm.begin(4800))
     Serial.println("\nstatus=READY");
   else Serial.println("\nstatus=IDLE");
-
-  //GPRS attach
+  
+  //GPRS attach, put in order APN, username and password.
+  //If no needed auth let them blank.
   if (gsm.attachGPRS("internet.wind", "", ""))
     Serial.println("status=ATTACHED");
   else Serial.println("status=ERROR");
+  delay(5000);
+  
+  //Read IP address.
   int i=0;
   while(i<20){
     gsm.SimpleRead();
     i++;
   }
   delay(5000);
-
+  gsm.write((const uint8_t*)"AT+CIFSR\r", 10);
+  gsm.read(msg, 200);
+  Serial.println(msg);
+  delay(5000); 
+  
   //Tweet
   //inet.tweet("*********************key************", "An Arduino at #cpes15");
 
-  // TCP Server.
-  gsm.write((const uint8_t*)"AT+CIFSR\r", 10);
-  gsm.read(msg, 200);
+  //TCP Server. Start the socket connection
+  //as server on the assigned port.
   Serial.println(msg);
   delay(5000);
   if (gsm.connectTCPServer(80))
     Serial.println("status=TCPSERVERWAIT");
   else Serial.println("ERROR in Server");
   lasttime=millis();
-
 };
 
 
-void loop() 
- {
+void loop(){
   //serialhwread();
   //serialswread();
- if (gsm.connectedClient())
- {
- Serial.println("A");
- gsm.read(msg, 200);
- Serial.println(msg);
- //gsm.write((const uint8_t*)"AT+CIPSTATUS\r", 14);
- }
- };
+  //Check if there is an active connection.
+  if (gsm.connectedClient()){
+    //Read and print the last message received.
+    gsm.read(msg, 200);
+    Serial.println(msg);
+  }
+};
 
 /*
 void loop() 
@@ -85,28 +86,29 @@ void serialhwread(){
       delay(10);
       i++;      
     }
-
+    
     inSerial[i]='\0';
     if(!strcmp(inSerial,"/END")){
-      //Serial.println("_");
+      Serial.println("_");
       inSerial[0]=0x1a;
       inSerial[1]='\0';
       gsm.SimpleWrite(inSerial);
     }
-
+    //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("TESTING");
+      Serial.println("SIGNAL QUALITY");
+      sm.SimpleWrite("AT+CSQ");
     }
-
+    //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
       Serial.println(msg);
     }
-
+    
     else{
       Serial.println(inSerial);
       gsm.SimpleWrite(inSerial);
     }    
-
+    
     inSerial[0]='\0';
   }
 }
@@ -114,5 +116,3 @@ void serialhwread(){
 void serialswread(){
   gsm.SimpleRead();
 }
-
-

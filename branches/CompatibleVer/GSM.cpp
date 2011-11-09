@@ -1,9 +1,28 @@
+/*
+This is a Beta version.
+last modified 08/11/2011.
+
+This library is based on one developed by Arduino Labs
+and it is modified to preserve the compability
+with the Arduino's product.
+
+The library is modified to use the GSM Shield,
+developed by www.open-electronics.org
+(http://www.open-electronics.org/arduino-gsm-shield/)
+and based on SIM900 chip,
+with the same commands of Arduino Shield,
+based on QuectelM10 chip.
+*/
+
 #include "GSM.h"
 #include "WideTextFinder.h"
 
 
-#define _GSM_TXPIN_ 4
-#define _GSM_RXPIN_ 5
+//#define _GSM_TXPIN_ 4
+//#define _GSM_RXPIN_ 5
+
+#define _GSM_TXPIN_ 2
+#define _GSM_RXPIN_ 3	
 
 GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE)
 {
@@ -101,12 +120,6 @@ int GSM::begin(long baud_rate)
 				  _cell.begin(baud_rate);
 				  delay(100);
 				  if (AT_RESP_OK == SendATCmdWaitResp("AT", 500, 100, "OK", 5)){
-						#ifdef DEBUG_PRINT
-							// parameter 0 - because module is off so it is not necessary 
-							// to send finish AT<CR> here
-							DebugPrint("DEBUG: ricevuto ok da modulo, baud impostato: ", 0);							
-							DebugPrint(baud_rate, 0);	
-						#endif
 						break;					
 				}
 				  
@@ -119,28 +132,14 @@ int GSM::begin(long baud_rate)
   
   
 		if (AT_RESP_ERR_NO_RESP == SendATCmdWaitResp("AT", 500, 50, "OK", 5)) {
-			#ifdef DEBUG_PRINT
-				// parameter 0 - because module is off so it is not necessary 
-				// to send finish AT<CR> here
-				DebugPrint("DEBUG: No answer from the module\r\n", 0);
-			#endif
 		}
 		else{
-	
-			#ifdef DEBUG_PRINT
-				// parameter 0 - because module is off so it is not necessary 
-				// to send finish AT<CR> here
-				DebugPrint("DEBUG: 1 baud ok\r\n", 0);
-			#endif
 		}
 
 
 	}
 	else
 	{
-		#ifdef DEBUG_PRINT
-			DebugPrint("DEBUG: 2 GSM module is on and baud is ok\r\n", 0);
-		#endif
   
 	}
   SetCommLineStatus(CLS_FREE);
@@ -150,7 +149,7 @@ int GSM::begin(long baud_rate)
   InitParam(PARAM_SET_1);//configure the module  
   Echo(0);               //enable AT echo 
   setStatus(READY);
-  delay(10000);
+  //delay(10000);
   return(1);
 }
 
@@ -162,10 +161,7 @@ void GSM::InitParam(byte group)
     case PARAM_SET_0:
       // check comm line
       if (CLS_FREE != GetCommLineStatus()) return;
-	  
-	  	#ifdef DEBUG_PRINT
-			DebugPrint("DEBUG: configure the module PARAM_SET_0\r\n", 0);
-		#endif
+
       SetCommLineStatus(CLS_ATCMD);
 
       // Reset to the factory settings
@@ -427,14 +423,6 @@ byte GSM::IsRxFinished(void)
     }
   }
 		
-  	#ifdef DEBUG_GSMRX
-		if (ret_val == RX_FINISHED){
-			DebugPrint("DEBUG: Received string\r\n", 0);
-			for (int i=0; i<comm_buf_len; i++){
-				Serial.print(byte(comm_buf[i]));	
-			}
-		}
-	#endif
 	
   return (ret_val);
 }
@@ -513,9 +501,7 @@ void GSM::Echo(byte state)
 	if (state == 0 or state == 1)
 	{
 	  SetCommLineStatus(CLS_ATCMD);
-	  #ifdef DEBUG_PRINT
-		DebugPrint("DEBUG Echo\r\n",1);
-	  #endif
+
 	  _cell.print("ATE");
 	  _cell.print((int)state);    
 	  _cell.print("\r");

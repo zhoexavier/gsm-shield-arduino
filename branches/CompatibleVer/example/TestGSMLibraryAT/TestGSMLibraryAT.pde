@@ -2,6 +2,11 @@
 #include <NewSoftSerial.h>
 #include "inetGSM.h"
 
+//GSM Shield for Arduino
+//www.open-electronics.org
+//this code is based on the example of Arduino Labs.
+
+//Simple sketch to communicate with SIM900 through AT commands.
 
 InetGSM inet;
 char msg[150];
@@ -15,16 +20,19 @@ void setup()
   //Serial connection.
   Serial.begin(9600);
   Serial.println("GSM Shield testing.");
-  //Start configuration.
+  //Start configuration of shield with baudrate.
+  //For http uses is raccomanded to use 4800 or slower.
   if (gsm.begin(4800))
     Serial.println("\nstatus=READY");
   else Serial.println("\nstatus=IDLE");
-  
 };
 
 void loop() 
 {
+  //Read for new byte on serial hardware,
+  //and write them on NewSoftSerial.
   serialhwread();
+  //Read for new byte on NewSoftSerial.
   serialswread();
 };
 
@@ -44,11 +52,12 @@ void serialhwread(){
       inSerial[1]='\0';
       gsm.SimpleWrite(inSerial);
     }
-    
+    //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("TESTING");
+      Serial.println("SIGNAL QUALITY");
+      sm.SimpleWrite("AT+CSQ");
     }
-    
+    //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
       Serial.println(msg);
     }

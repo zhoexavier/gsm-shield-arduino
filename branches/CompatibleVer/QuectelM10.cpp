@@ -1,3 +1,19 @@
+/*
+This is a Beta version.
+last modified 08/11/2011.
+
+This library is based on one developed by Arduino Labs
+and it is modified to preserve the compability
+with the Arduino's product.
+
+The library is modified to use the GSM Shield,
+developed by www.open-electronics.org
+(http://www.open-electronics.org/arduino-gsm-shield/)
+and based on SIM900 chip,
+with the same commands of Arduino Shield,
+based on QuectelM10 chip.
+*/
+
 #include "QuectelM10.h"  
 #include "Streaming.h"
 
