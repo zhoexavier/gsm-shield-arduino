@@ -1,4 +1,4 @@
-#include "QuectelM10.h"
+#include "SIM900.h"
 #include <NewSoftSerial.h>
 #include "inetGSM.h"
 
@@ -74,7 +74,7 @@ void serialhwread(){
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
       Serial.println("SIGNAL QUALITY");
-      sm.SimpleWrite("AT+CSQ");
+      gsm.SimpleWrite("AT+CSQ");
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){

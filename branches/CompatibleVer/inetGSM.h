@@ -3,7 +3,7 @@
 
 #define BUFFERSIZE 200
 
-#include "QuectelM10.h"
+#include "SIM900.h"
 
 class InetGSM
 {

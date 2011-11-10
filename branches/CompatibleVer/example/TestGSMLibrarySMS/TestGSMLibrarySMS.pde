@@ -1,4 +1,4 @@
-#include "QuectelM10.h"
+#include "SIM900.h"
 #include <NewSoftSerial.h>
 //If not used, is better to exclude the HTTP library,
 //for RAM saving.
