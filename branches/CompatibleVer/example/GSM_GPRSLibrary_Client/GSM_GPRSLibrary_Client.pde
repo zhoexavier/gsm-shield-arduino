@@ -14,7 +14,7 @@ InetGSM inet;
 //CallGSM call;
 //SMSGSM sms;
 
-char msg[100];
+char msg[50];
 int numdata;
 char inSerial[30];
 int i=0;
@@ -39,7 +39,7 @@ void setup()
   
   //TCP Client GET, send a GET request to the server and
   //save the reply.
-  numdata=inet.httpGET("www.google.com", 80, "/", msg, 100);
+  numdata=inet.httpGET("www.google.com", 80, "/", msg, 50);
   //Print the results.
   Serial.println("\nNumber of data received:");
   Serial.println(numdata);  
