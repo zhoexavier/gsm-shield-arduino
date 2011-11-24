@@ -1,6 +1,8 @@
 #include "SIM900.h"
 #include <NewSoftSerial.h>
-#include "inetGSM.h"
+//#include "inetGSM.h"
+//#include "sms.h"
+//#include "call.h"
 
 //GSM Shield for Arduino
 //www.open-electronics.org
@@ -8,7 +10,10 @@
 
 //Simple sketch to communicate with SIM900 through AT commands.
 
-InetGSM inet;
+//InetGSM inet;
+//CallGSM call;
+//SMSGSM sms;
+
 char msg[150];
 int numdata;
 char inSerial[40];

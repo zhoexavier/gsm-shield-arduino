@@ -6,6 +6,10 @@
 //your memory available.
 //#include "inetGSM.h"
 
+//If you want to use the Arduino functions to manage SMS, uncomment the lines below.
+//#include "sms.h"
+//SMSGSM sms;
+
 //GSM Shield for Arduino
 //www.open-electronics.org
 //this code is based on the example of Arduino Labs.
