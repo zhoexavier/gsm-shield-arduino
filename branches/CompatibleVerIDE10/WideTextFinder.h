@@ -2,7 +2,6 @@
 #define WideTextFinder_h
 
 //#include <WProgram.h>
-#define ARDUINO_MAIN
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 
