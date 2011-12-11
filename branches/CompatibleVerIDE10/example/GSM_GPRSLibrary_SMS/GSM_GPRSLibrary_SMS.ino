@@ -31,8 +31,8 @@ void setup()
   else Serial.println("\nstatus=IDLE");
   
   //Enable this two lines if you want to send an SMS.
-  if (sms.SendSMS("3920934102", "Arduino SMS"))
-    Serial.println("\nSMS sent OK");
+  //if (sms.SendSMS("3471234567", "Arduino SMS"))
+    //Serial.println("\nSMS sent OK");
 
 };
 
