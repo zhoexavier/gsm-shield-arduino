@@ -1,5 +1,5 @@
 #include "SIM900.h"
-#include <NewSoftSerial.h>
+#include <SoftwareSerial.h>
 //If not used, is better to exclude the HTTP library,
 //for RAM saving.
 //If your sketch reboots itself proprably you have finished,
