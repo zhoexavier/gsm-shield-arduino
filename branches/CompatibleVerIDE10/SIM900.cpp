@@ -288,7 +288,7 @@ int QuectelM10::connectTCP(const char* server, int port)
   }
 
   //Serial.println("CONNECTED");
-  delay(1000);
+  delay(3000);
   _cell << "AT+CIPSEND\r";
   switch(WaitResp(5000, 200, ">")){
 	case RX_TMOUT_ERR: 
@@ -299,8 +299,8 @@ int QuectelM10::connectTCP(const char* server, int port)
 	break;
   }
 
-  //Serial.println("MOD INVIO");
-  delay(2000);
+  Serial.println("MOD INVIO");
+  delay(4000);
   return 1;
 }
 

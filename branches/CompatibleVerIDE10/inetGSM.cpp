@@ -13,7 +13,7 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
   if(gsm.getStatus()!=GSM::ATTACHED)
     return 0;
   */
-    
+  
   if(!gsm.connectTCP(server, port))
     return 0;
   

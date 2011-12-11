@@ -63,29 +63,33 @@ int GSM::begin(long baud_rate)
 			
 
 			  //SendATCmdWaitResp("AT+IPR=9600", 500, 50, "OK", 5);
-			  for (int i=1;i<7;i++){
+			  for (int i=1;i<8;i++){
 					switch (i) {
 					case 1:
+					  _cell.begin(2400);
+				    
+					  break;
+					case 2:
 					  _cell.begin(4800);
 
 					  break;
-					case 2:
+					case 3:
 					  _cell.begin(9600);
 
 					  break;
-					case 3:
+					case 4:
 					  _cell.begin(19200);
 
 					  break;
-					case 4:
+					case 5:
 					  _cell.begin(38400);
 
 					  break;
-					case 5:
+					case 6:
 					  _cell.begin(57600);
 
 					  break;
-					case 6:
+					case 7:
 					  _cell.begin(115200);
 
 					  break;
@@ -105,7 +109,8 @@ int GSM::begin(long baud_rate)
 	  
 	  
 				  delay(100);
-				  /*sprintf (buff,"AT+IPR=%f",baud_rate);
+				  //sprintf (buff,"AT+IPR=%f",baud_rate);
+					/*
 					#ifdef DEBUG_PRINT
 						// parameter 0 - because module is off so it is not necessary 
 						// to send finish AT<CR> here
