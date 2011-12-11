@@ -23,9 +23,9 @@ based on QuectelM10 chip.
 
 #define RESETPIN 7
 
-//QuectelM10 gsm;
-//QuectelM10::QuectelM10(){};
-//QuectelM10::~QuectelM10(){};
+QuectelM10 gsm;
+QuectelM10::QuectelM10(){};
+QuectelM10::~QuectelM10(){};
   
 int QuectelM10::restart(char* pin)
 {
