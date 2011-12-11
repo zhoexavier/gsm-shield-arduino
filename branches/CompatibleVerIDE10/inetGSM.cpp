@@ -17,15 +17,15 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
   if(!gsm.connectTCP(server, port))
     return 0;
   
-  gsm.write((const uint8_t*)"GET ", 4);
-  gsm.write((const uint8_t*)path, strlen(path));
-  gsm.write((const uint8_t*)" HTTP/1.0\nHost: ", 16);
-  gsm.write((const uint8_t*)server, strlen(server));
-  gsm.write((const uint8_t*)"\n",1);
-  gsm.write((const uint8_t*)"User-Agent: Arduino",20);
-  gsm.write((const uint8_t*)"\n\n",2);
+  gsm.writeB("GET ");
+  gsm.writeB(path);
+  gsm.writeB(" HTTP/1.0\nHost: ");
+  gsm.writeB(server);
+  gsm.writeB("\n");
+  gsm.writeB("User-Agent: Arduino");
+  gsm.writeB("\n\n");
 
-  gsm.write((const uint8_t*)end_c,2);
+  gsm.writeB(end_c);
 
   switch(gsm.WaitResp(10000, 100, "SEND")){
 	case RX_TMOUT_ERR: 
@@ -36,7 +36,7 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
 	break;
   }
 
-
+  Serial.println("SENT");
   int res= gsm.read(result, resultlength);
 
   //gsm.disconnectTCP();
@@ -68,7 +68,7 @@ int InetGSM::httpPOST(const char* server, int port, const char* path, const char
   
   
   
-  gsm.write((const uint8_t*)_buffer, strlen(_buffer));
+  gsm.writeB(_buffer);
 
 
 //  int res= gsm.read(result, resultlength);

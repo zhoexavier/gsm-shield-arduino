@@ -33,6 +33,7 @@ class QuectelM10 : public virtual GSM
     int write(const uint8_t* buffer, size_t sz);
 	int write(uint8_t c);
     int write(const char* str);
+    int writeB(const char* buffer);
 	
     int read(char* result, int resultlength);
 	uint8_t read();

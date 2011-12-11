@@ -276,6 +276,7 @@ int QuectelM10::connectTCP(const char* server, int port)
 		return 0; 
 	break;
   }
+  //Serial.println("RCVD INPUT");
 
   switch(WaitResp(15000, 200, "CONNECT")){
 	case RX_TMOUT_ERR: 
@@ -286,7 +287,8 @@ int QuectelM10::connectTCP(const char* server, int port)
 	break;
   }
 
-
+  //Serial.println("CONNECTED");
+  delay(1000);
   _cell << "AT+CIPSEND\r";
   switch(WaitResp(5000, 200, ">")){
 	case RX_TMOUT_ERR: 
@@ -297,7 +299,7 @@ int QuectelM10::connectTCP(const char* server, int port)
 	break;
   }
 
-  Serial.println("CONNESSO");
+  //Serial.println("MOD INVIO");
   delay(2000);
   return 1;
 }
@@ -406,6 +408,10 @@ boolean QuectelM10::connectedClient()
     return false;
  }
 
+int QuectelM10::writeB(const char* buffer){
+	_cell << buffer;
+}
+
 int QuectelM10::write(const uint8_t* buffer, size_t sz)
 {
 /*
@@ -418,10 +424,12 @@ int QuectelM10::write(const uint8_t* buffer, size_t sz)
   _tf.setTimeout(_GSM_DATA_TOUT_);
 
 //  _cell.flush();
-    
-  for(int i=0;i<sz;i++)
-    _cell << _DEC(buffer[i]);
   
+  for(int i=0;i<sz;i++)
+    _cell << (buffer[i]);
+  
+  
+  //_cell.print(buffer)
   //Not response for a write.
   /*if(_tf.find("OK"))
     return sz;
