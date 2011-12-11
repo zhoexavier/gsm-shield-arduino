@@ -8,16 +8,17 @@
 //www.open-electronics.org
 //this code is based on the example of Arduino Labs.
 
-//Simple sketch to start a connection as client.
+//Simple sketch to start a connection as server.
 
 InetGSM inet;
 //CallGSM call;
 //SMSGSM sms;
 
-char msg[50];
+char msg[100];
 int numdata;
 char inSerial[30];
 int i=0;
+long lasttime;
 
 void setup() 
 {
@@ -26,7 +27,7 @@ void setup()
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(4800))
+  if (gsm.begin(2400))
     Serial.println("\nstatus=READY");
   else Serial.println("\nstatus=IDLE");
   
@@ -37,28 +38,50 @@ void setup()
   else Serial.println("status=ERROR");
   delay(5000);
   
-  //TCP Client GET, send a GET request to the server and
-  //save the reply.
-  numdata=inet.httpGET("www.google.com", 80, "/", msg, 50);
-  //Print the results.
-  Serial.println("\nNumber of data received:");
-  Serial.println(numdata);  
-  Serial.println("Data received:"); 
-  Serial.println(msg); 
-
+  //Read IP address.
+  int i=0;
+  while(i<20){
+    gsm.SimpleRead();
+    i++;
+  }
+  delay(5000);
+  gsm.write((const uint8_t*)"AT+CIFSR\r", 10);
+  gsm.read(msg, 200);
+  Serial.println(msg);
+  delay(5000); 
+  
   //Tweet
   //inet.tweet("*********************key************", "An Arduino at #cpes15");
 
+  //TCP Server. Start the socket connection
+  //as server on the assigned port.
+  Serial.println(msg);
+  delay(5000);
+  if (gsm.connectTCPServer(80))
+    Serial.println("status=TCPSERVERWAIT");
+  else Serial.println("ERROR in Server");
+  lasttime=millis();
 };
 
+
+void loop(){
+  //serialhwread();
+  //serialswread();
+  //Check if there is an active connection.
+  if (gsm.connectedClient()){
+    //Read and print the last message received.
+    gsm.read(msg, 200);
+    Serial.println(msg);
+  }
+};
+
+/*
 void loop() 
 {
-  //Read for new byte on serial hardware,
-  //and write them on NewSoftSerial.
   serialhwread();
-  //Read for new byte on NewSoftSerial.
   serialswread();
 };
+*/
 
 void serialhwread(){
   i=0;

@@ -27,7 +27,7 @@ void setup()
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(4800))
+  if (gsm.begin(9600))
     Serial.println("\nstatus=READY");
   else Serial.println("\nstatus=IDLE");
 };
