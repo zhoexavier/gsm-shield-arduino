@@ -23,11 +23,11 @@ based on QuectelM10 chip.
 
 #define RESETPIN 7
 
-QuectelM10 gsm;
-QuectelM10::QuectelM10(){};
-QuectelM10::~QuectelM10(){};
+SIMCOM900 gsm;
+SIMCOM900::SIMCOM900(){};
+SIMCOM900::~SIMCOM900(){};
   
-int QuectelM10::restart(char* pin){
+int SIMCOM900::restart(char* pin){
 	pinMode(RESETPIN, OUTPUT);
 	digitalWrite(RESETPIN, HIGH);
 	delay(10000);
@@ -36,7 +36,7 @@ int QuectelM10::restart(char* pin){
 	return configandwait(pin);
 }
 
-int QuectelM10::start(char* pin){
+int SIMCOM900::start(char* pin){
 	_tf.setTimeout(_TCP_CONNECTION_TOUT_);
 	pinMode(RESETPIN, OUTPUT);
 	digitalWrite(RESETPIN, HIGH);
@@ -46,7 +46,7 @@ int QuectelM10::start(char* pin){
 	return configandwait(pin);
 }
 
-int QuectelM10::configandwait(char* pin)
+int SIMCOM900::configandwait(char* pin)
 {
   int connCode;
   _tf.setTimeout(_GSM_CONNECTION_TOUT_);
@@ -82,7 +82,7 @@ int QuectelM10::configandwait(char* pin)
   return 0;
 }
 
-int QuectelM10::shutdown()
+int SIMCOM900::shutdown()
 {
   pinMode(RESETPIN, OUTPUT);
   digitalWrite(RESETPIN, HIGH);
@@ -104,7 +104,7 @@ int QuectelM10::shutdown()
    return 0;
 }     
   
-int QuectelM10::sendSMS(const char* to, const char* msg)
+int SIMCOM900::sendSMS(const char* to, const char* msg)
 {
 
   //Status = READY or ATTACHED.
@@ -138,7 +138,7 @@ int QuectelM10::sendSMS(const char* to, const char* msg)
   return 1;
 }
 
-int QuectelM10::attachGPRS(char* domain, char* dom1, char* dom2)
+int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
 {
 
    delay(5000);
@@ -211,7 +211,7 @@ int QuectelM10::attachGPRS(char* domain, char* dom1, char* dom2)
  }
 }
 
-int QuectelM10::dettachGPRS()
+int SIMCOM900::dettachGPRS()
 {
   if (getStatus()==IDLE) return 0;
    
@@ -240,7 +240,7 @@ int QuectelM10::dettachGPRS()
   return 1;
 }
 
-int QuectelM10::connectTCP(const char* server, int port)
+int SIMCOM900::connectTCP(const char* server, int port)
 {
   _tf.setTimeout(_TCP_CONNECTION_TOUT_);
 
@@ -289,7 +289,7 @@ int QuectelM10::connectTCP(const char* server, int port)
   return 1;
 }
 
-int QuectelM10::disconnectTCP()
+int SIMCOM900::disconnectTCP()
 {
   //Status = TCPCONNECTEDCLIENT or TCPCONNECTEDSERVER.
   /*
@@ -328,7 +328,7 @@ int QuectelM10::disconnectTCP()
     return 1;
 }
 
-int QuectelM10::connectTCPServer(int port)
+int SIMCOM900::connectTCPServer(int port)
 {
 /*
   if (getStatus()!=ATTACHED)
@@ -365,7 +365,7 @@ int QuectelM10::connectTCPServer(int port)
 
 }
 
-boolean QuectelM10::connectedClient()
+boolean SIMCOM900::connectedClient()
 {
   /*
   if (getStatus()!=TCPSERVERWAIT)
@@ -393,11 +393,11 @@ boolean QuectelM10::connectedClient()
     return false;
  }
 
-int QuectelM10::writeB(const char* buffer){
+int SIMCOM900::writeB(const char* buffer){
 	_cell << buffer;
 }
 
-int QuectelM10::write(const uint8_t* buffer, size_t sz)
+int SIMCOM900::write(const uint8_t* buffer, size_t sz)
 {
 /*
    if((getStatus() != TCPCONNECTEDSERVER)&&(getStatus() != TCPCONNECTEDCLIENT))
@@ -425,7 +425,7 @@ int QuectelM10::write(const uint8_t* buffer, size_t sz)
 }
 
 
-int QuectelM10::read(char* result, int resultlength)
+int SIMCOM900::read(char* result, int resultlength)
 {
   // Or maybe do it with AT+QIRD
 
@@ -447,7 +447,7 @@ int QuectelM10::read(char* result, int resultlength)
   return charget;
 }
 
- int QuectelM10::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
+ int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
 {
   if (getStatus()==IDLE)
     return 0;
@@ -471,7 +471,7 @@ int QuectelM10::read(char* result, int resultlength)
 }
 
 
-boolean QuectelM10::readSMS(char* msg, int msglength, char* number, int nlength)
+boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 {
   long index;
   /*
@@ -494,7 +494,7 @@ boolean QuectelM10::readSMS(char* msg, int msglength, char* number, int nlength)
 };
 
 
-boolean QuectelM10::readCall(char* number, int nlength)
+boolean SIMCOM900::readCall(char* number, int nlength)
 {
   int index;
 
@@ -514,7 +514,7 @@ boolean QuectelM10::readCall(char* number, int nlength)
   return false;
 };
 
-boolean QuectelM10::call(char* number, unsigned int milliseconds)
+boolean SIMCOM900::call(char* number, unsigned int milliseconds)
 { 
   if (getStatus()==IDLE)
     return false;
@@ -529,7 +529,7 @@ boolean QuectelM10::call(char* number, unsigned int milliseconds)
  
 }
 
-int QuectelM10::setPIN(char *pin)
+int SIMCOM900::setPIN(char *pin)
 {
   //Status = READY or ATTACHED.
   if((getStatus() != IDLE))
@@ -549,7 +549,7 @@ int QuectelM10::setPIN(char *pin)
     return 1;
 }
 
-int QuectelM10::write(uint8_t c)
+int SIMCOM900::write(uint8_t c)
 {
   if ((getStatus() == TCPCONNECTEDCLIENT) ||(getStatus() == TCPCONNECTEDSERVER) )
     return write(&c, 1);
@@ -557,7 +557,7 @@ int QuectelM10::write(uint8_t c)
     return 0;
 }
 
-int QuectelM10::write(const char* str)
+int SIMCOM900::write(const char* str)
 {
   if ((getStatus() == TCPCONNECTEDCLIENT) ||(getStatus() == TCPCONNECTEDSERVER) )
       return write((const uint8_t*)str, strlen(str));
@@ -565,7 +565,7 @@ int QuectelM10::write(const char* str)
       return 0;
 }
 
-int QuectelM10::changeNSIPmode(char mode) ///SYVV
+int SIMCOM900::changeNSIPmode(char mode) ///SYVV
 {
     _tf.setTimeout(_TCP_CONNECTION_TOUT_);
     
@@ -581,7 +581,7 @@ int QuectelM10::changeNSIPmode(char mode) ///SYVV
     return 1;
 }
 
-int QuectelM10::getCCI(char *cci)
+int SIMCOM900::getCCI(char *cci)
 {
   //Status must be READY
   if((getStatus() != READY))
@@ -604,7 +604,7 @@ int QuectelM10::getCCI(char *cci)
     return 1;
 }
   
-int QuectelM10::getIMEI(char *imei)
+int SIMCOM900::getIMEI(char *imei)
 {
       
   _tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
@@ -624,12 +624,12 @@ int QuectelM10::getIMEI(char *imei)
     return 1;
 }
 
-uint8_t QuectelM10::read()
+uint8_t SIMCOM900::read()
 {
   return _cell.read();
 }
 
-void QuectelM10::SimpleRead()
+void SIMCOM900::SimpleRead()
 {
 	char datain;
 	if(_cell.available()>0){
@@ -640,27 +640,27 @@ void QuectelM10::SimpleRead()
 	}
 }
 
-void QuectelM10::SimpleWrite(char *comm)
+void SIMCOM900::SimpleWrite(char *comm)
 {
 	_cell.println(comm);
 }
 
-void QuectelM10::SimpleWrite(const char *comm)
+void SIMCOM900::SimpleWrite(const char *comm)
 {
 	_cell.println(comm);
 }
 
-void QuectelM10::SimpleWrite(int comm)
+void SIMCOM900::SimpleWrite(int comm)
 {
 	_cell.println(comm);
 }
 
-void QuectelM10::SimpleWriteWOln(char *comm)
+void SIMCOM900::SimpleWriteWOln(char *comm)
 {
 	_cell.print(comm);
 }
 
-void QuectelM10::WhileSimpleRead()
+void SIMCOM900::WhileSimpleRead()
 {
 	char datain;
 	while(_cell.available()>0){

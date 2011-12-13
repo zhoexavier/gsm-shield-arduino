@@ -1,9 +1,9 @@
-#ifndef QUECTELM10_H
-#define QUECTELM10_H
+#ifndef SIMCOM900_H
+#define SIMCOM900_H
 #include <SoftwareSerial.h>
 #include "GSM.h"
 
-class QuectelM10 : public virtual GSM
+class SIMCOM900 : public virtual GSM
 {
 
   private:
@@ -12,8 +12,8 @@ class QuectelM10 : public virtual GSM
     int changeNSIPmode(char);
 
   public:
-    QuectelM10();
-    ~QuectelM10();
+    SIMCOM900();
+    ~SIMCOM900();
     int start(char* pin=0);
     int restart(char* pin=0);
     int shutdown();
@@ -44,7 +44,7 @@ class QuectelM10 : public virtual GSM
     void SimpleWrite(int comm);
 };
 
-extern QuectelM10 gsm;
+extern SIMCOM900 gsm;
 
 #endif
 
