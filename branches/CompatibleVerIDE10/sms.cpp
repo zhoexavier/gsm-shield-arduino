@@ -293,7 +293,7 @@ char SMSGSM::GetSMS(byte position, char *phone_number, char *SMS_text, byte max_
   
   //send "AT+CMGR=X" - where X = position
   gsm.SimpleWrite("AT+CMGR=");
-  gsm.SimpleWriteInt((int)position);  
+  gsm.SimpleWrite((int)position);  
   gsm.SimpleWrite("\r");
 
   // 5000 msec. for initial comm tmout
@@ -537,7 +537,7 @@ char SMSGSM::DeleteSMS(byte position)
   
   //send "AT+CMGD=XY" - where XY = position
   gsm.SimpleWrite("AT+CMGD=");
-  gsm.SimpleWriteInt((int)position);  
+  gsm.SimpleWrite((int)position);  
   gsm.SimpleWrite("\r");
 
 

@@ -27,38 +27,23 @@ QuectelM10 gsm;
 QuectelM10::QuectelM10(){};
 QuectelM10::~QuectelM10(){};
   
-int QuectelM10::restart(char* pin)
-{
-  pinMode(RESETPIN, OUTPUT);
-  digitalWrite(RESETPIN, HIGH);
-  delay(10000);
-  digitalWrite(RESETPIN, LOW);
-  delay(1000);
-
-  return configandwait(pin);
+int QuectelM10::restart(char* pin){
+	pinMode(RESETPIN, OUTPUT);
+	digitalWrite(RESETPIN, HIGH);
+	delay(10000);
+	digitalWrite(RESETPIN, LOW);
+	delay(1000);
+	return configandwait(pin);
 }
 
-int QuectelM10::start(char* pin)
-{
-
-  _tf.setTimeout(_TCP_CONNECTION_TOUT_);
-
-  //_cell.flush();
-// Just for old style software restart();  
-//  _cell << "AT+CFUN=1" <<  _DEC(cr) << endl; //Comprobar
-//   if (!_tf.find("OK")) 
-//   {
-//     setStatus(IDLE);
-//     return 0;
-//   }
-
-  pinMode(RESETPIN, OUTPUT);
-  digitalWrite(RESETPIN, HIGH);
-  delay(10000);
-  digitalWrite(RESETPIN, LOW);
-  delay(1000);
-
-  return configandwait(pin);
+int QuectelM10::start(char* pin){
+	_tf.setTimeout(_TCP_CONNECTION_TOUT_);
+	pinMode(RESETPIN, OUTPUT);
+	digitalWrite(RESETPIN, HIGH);
+	delay(10000);
+	digitalWrite(RESETPIN, LOW);
+	delay(1000);
+	return configandwait(pin);
 }
 
 int QuectelM10::configandwait(char* pin)
@@ -660,7 +645,12 @@ void QuectelM10::SimpleWrite(char *comm)
 	_cell.println(comm);
 }
 
-void QuectelM10::SimpleWriteInt(int comm)
+void QuectelM10::SimpleWrite(const char *comm)
+{
+	_cell.println(comm);
+}
+
+void QuectelM10::SimpleWrite(int comm)
 {
 	_cell.println(comm);
 }

@@ -17,15 +17,15 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
   if(!gsm.connectTCP(server, port))
     return 0;
   
-  gsm.writeB("GET ");
-  gsm.writeB(path);
-  gsm.writeB(" HTTP/1.0\nHost: ");
-  gsm.writeB(server);
-  gsm.writeB("\n");
-  gsm.writeB("User-Agent: Arduino");
-  gsm.writeB("\n\n");
+  gsm.SimpleWrite("GET ");
+  gsm.SimpleWrite(path);
+  gsm.SimpleWrite(" HTTP/1.0\nHost: ");
+  gsm.SimpleWrite(server);
+  gsm.SimpleWrite("\n");
+  gsm.SimpleWrite("User-Agent: Arduino");
+  gsm.SimpleWrite("\n\n");
 
-  gsm.writeB(end_c);
+  gsm.SimpleWrite(end_c);
 
   switch(gsm.WaitResp(10000, 100, "SEND")){
 	case RX_TMOUT_ERR: 
@@ -96,30 +96,30 @@ int InetGSM::openmail(char* server, char* loginbase64, char* passbase64, char* f
     
     delay(1000);
     gsm.read(_buffer, BUFFERSIZE);    
-    gsm.write("HELO\n");
+    gsm.SimpleWrite("HELO\n");
     delay(500);
     gsm.read(_buffer, BUFFERSIZE);
-    gsm.write("AUTH LOGIN\n");
+    gsm.SimpleWrite("AUTH LOGIN\n");
     delay(500);
     gsm.read(_buffer, BUFFERSIZE);
-    gsm.write(loginbase64);gsm.write("\n");
+    gsm.SimpleWrite(loginbase64);gsm.SimpleWrite("\n");
     delay(500);
     gsm.read(_buffer, BUFFERSIZE);
-    gsm.write(passbase64);gsm.write("\n");
+    gsm.SimpleWrite(passbase64);gsm.SimpleWrite("\n");
     delay(500);
     gsm.read(_buffer, BUFFERSIZE);
-    gsm.write("MAIL FROM: ");gsm.write(from);gsm.write("\n");
+    gsm.SimpleWrite("MAIL FROM: ");gsm.SimpleWrite(from);gsm.SimpleWrite("\n");
     delay(500);
     gsm.read(_buffer, BUFFERSIZE);
-    gsm.write("RCPT TO: ");gsm.write(to);gsm.write("\n");
+    gsm.SimpleWrite("RCPT TO: ");gsm.SimpleWrite(to);gsm.SimpleWrite("\n");
     delay(500);
     gsm.read(_buffer, BUFFERSIZE);
-    gsm.write("Subject: ");gsm.write(subj);gsm.write("\n\n");
+    gsm.SimpleWrite("Subject: ");gsm.SimpleWrite(subj);gsm.SimpleWrite("\n\n");
     return 1;
 }
 int InetGSM::closemail()
 {
-	gsm.write("\n.\n");
+	gsm.SimpleWrite("\n.\n");
 	gsm.disconnectTCP();
 	return 1;
 }
