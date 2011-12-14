@@ -45,9 +45,7 @@ void setup()
     i++;
   }
   delay(5000);
-  gsm.write((const uint8_t*)"AT+CIFSR\r", 10);
-  gsm.read(msg, 200);
-  Serial.println(msg);
+  gsm.writeB("AT+CIFSR\r", 10);
   delay(5000); 
   
   //Tweet
