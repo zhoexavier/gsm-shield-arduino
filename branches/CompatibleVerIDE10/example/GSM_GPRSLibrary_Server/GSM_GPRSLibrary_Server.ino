@@ -45,7 +45,7 @@ void setup()
     i++;
   }
   delay(5000);
-  gsm.writeB("AT+CIFSR\r", 10);
+  gsm.writeB("AT+CIFSR\r");
   delay(5000); 
   
   //Tweet
