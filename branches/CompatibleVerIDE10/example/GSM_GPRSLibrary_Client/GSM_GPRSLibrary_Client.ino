@@ -36,6 +36,12 @@ void setup()
     Serial.println("status=ATTACHED");
   else Serial.println("status=ERROR");
   delay(10000);
+
+  //Read IP address.
+  gsm.writeB("AT+CIFSR\r");
+  gsm.read(msg, 200);
+  Serial.println(msg);
+  delay(5000); 
   
   //TCP Client GET, send a GET request to the server and
   //save the reply.
