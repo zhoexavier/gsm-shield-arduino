@@ -26,8 +26,8 @@ class SIMCOM900 : public virtual GSM
     int disconnectTCP();
     int connectTCPServer(int port);
     boolean connectedClient();
-    int read(char* result, int resultlength);
-	uint8_t read();
+    virtual int read(char* result, int resultlength);
+	virtual uint8_t read();
     int readCellData(int &mcc, int &mnc, long &lac, long &cellid);
     void SimpleRead();
     void WhileSimpleRead();
