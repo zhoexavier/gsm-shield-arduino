@@ -12,7 +12,7 @@
 #define ctrlz 26 //Ascii character for ctr+z. End of a SMS.
 #define cr    13 //Ascii character for carriage return. 
 #define lf    10 //Ascii character for line feed.
-#define GSM_LIB_VERSION 301 // library version X.YY (e.g. 1.00)
+#define GSM_LIB_VERSION 303 // library version X.YY (e.g. 1.00)
 
 // if defined - debug print is enabled with possibility to print out 
 // debug texts to the terminal program
