@@ -38,6 +38,12 @@ void setup()
   delay(10000);
 
   //Read IP address.
+  int i=0;
+  while(i<20){
+    gsm.SimpleRead();
+    i++;
+  }
+  delay(5000);
   gsm.SimpleWrite("AT+CIFSR\r");
   delay(5000); 
   
