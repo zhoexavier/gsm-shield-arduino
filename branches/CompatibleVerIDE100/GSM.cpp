@@ -17,12 +17,19 @@ based on QuectelM10 chip.
 #include "GSM.h"
 #include "WideTextFinder.h"
 
+#ifndef _GSM_TXPIN_
+  #define _GSM_TXPIN_ 4
+#endif
+
+#ifndef _GSM_RXPIN_
+  #define _GSM_RXPIN_ 5
+#endif
 
 //#define _GSM_TXPIN_ 4
 //#define _GSM_RXPIN_ 5
 
-#define _GSM_TXPIN_ 2
-#define _GSM_RXPIN_ 3	
+//#define _GSM_TXPIN_ 2
+//#define _GSM_RXPIN_ 3	
 
 GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE){
 };
