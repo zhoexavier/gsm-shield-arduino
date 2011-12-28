@@ -107,8 +107,8 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("SIGNAL QUALITY");
-      gsm.SimpleWrite("AT+CSQ");
+      Serial.println("TCP");
+      gsm.connectTCP("www.google.it",80);
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
