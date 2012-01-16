@@ -44,11 +44,15 @@ char SMSGSM::SendSMS(char *number_str, char *message_str)
     gsm.SimpleWriteWOln(number_str);  
     gsm.SimpleWrite("\"");
     
-    Serial.println("TEST");
+	#ifdef DEBUG_ON
+		Serial.println("DEBUG: SMS TEST");
+	#endif
     // 1000 msec. for initial comm tmout
     // 50 msec. for inter character timeout
     if (RX_FINISHED_STR_RECV == gsm.WaitResp(1000, 500, ">")) {
-	Serial.println("OK1");
+		#ifdef DEBUG_ON
+			Serial.println("DEBUG: RECEIVED >");
+		#endif
       // send SMS text
       gsm.SimpleWriteWOln(message_str); 
       gsm.SimpleWrite(end);

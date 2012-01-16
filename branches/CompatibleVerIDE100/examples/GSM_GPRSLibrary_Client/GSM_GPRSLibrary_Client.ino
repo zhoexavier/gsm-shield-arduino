@@ -1,28 +1,25 @@
 #include "SIM900.h"
 #include <SoftwareSerial.h>
-//#include "inetGSM.h"
+#include "inetGSM.h"
 //#include "sms.h"
 //#include "call.h"
 
-//To change pins for Software Serial, use the two lines below.
-//#define _GSM_TXPIN_ 2
-//#define _GSM_RXPIN_ 3	
+//To change pins for Software Serial, use the two lines in GSM.cpp.
 
 //GSM Shield for Arduino
 //www.open-electronics.org
 //this code is based on the example of Arduino Labs.
 
-//Simple sketch to communicate with SIM900 through AT commands.
+//Simple sketch to start a connection as client.
 
-//InetGSM inet;
+InetGSM inet;
 //CallGSM call;
 //SMSGSM sms;
 
-char msg[150];
+char msg[20];
 int numdata;
-char inSerial[40];
+char inSerial[50];
 int i=0;
-
 
 void setup() 
 {
@@ -31,9 +28,34 @@ void setup()
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(9600))
+  if (gsm.begin(2400))
     Serial.println("\nstatus=READY");
   else Serial.println("\nstatus=IDLE");
+  
+  //GPRS attach, put in order APN, username and password.
+  //If no needed auth let them blank.
+  if (gsm.attachGPRS("internet.wind", "", ""))
+    Serial.println("status=ATTACHED");
+  else Serial.println("status=ERROR");
+  delay(10000);
+  
+  //Read IP address.
+  gsm.SimpleWrite("AT+CIFSR");
+  delay(5000);
+  int i=0;
+  while(i<20){
+    gsm.SimpleRead();
+    i++;
+  }
+
+  //TCP Client GET, send a GET request to the server and
+  //save the reply.
+  numdata=inet.httpGET("www.google.com", 80, "/", msg, 50);
+  //Print the results.
+  Serial.println("\nNumber of data received:");
+  Serial.println(numdata);  
+  Serial.println("Data received:"); 
+  Serial.println(msg); 
 };
 
 void loop() 
@@ -63,9 +85,9 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("SIGNAL QUALITY");
-      gsm.SimpleWrite("AT+CSQ");
+        gsm.SimpleWrite("AT+CSQ");
     }
+	
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
       Serial.println(msg);

@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 28/12/2011.
+last modified 16/01/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -17,44 +17,46 @@ based on QuectelM10 chip.
 #include "GSM.h"
 #include "WideTextFinder.h"
 
-#ifndef _GSM_TXPIN_
-  #define _GSM_TXPIN_ 4
-#endif
-
-#ifndef _GSM_RXPIN_
-  #define _GSM_RXPIN_ 5
-#endif
-
 //#define _GSM_TXPIN_ 4
 //#define _GSM_RXPIN_ 5
 
-//#define _GSM_TXPIN_ 2
-//#define _GSM_RXPIN_ 3	
+#define _GSM_TXPIN_ 2
+#define _GSM_RXPIN_ 3	
 
 GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE){
 };
 
 int GSM::begin(long baud_rate){
+	int response=-1;
+	boolean turnedON=false;
 	SetCommLineStatus(CLS_ATCMD);
 	_cell.begin(baud_rate);
 	setStatus(IDLE); 
-	#ifdef DEBUG_PRINT
-		// parameter 0 - because module is off so it is not necessary 
-		// to send finish AT<CR> here
-		DebugPrint("DEBUG: baud ", 0);
-		DebugPrint(baud_rate, 0);
-	#endif
-  
+		
+	if (AT_RESP_OK == SendATCmdWaitResp("AT", 500, 100, "OK", 5)){
+		#ifdef DEBUG_ON
+			Serial.println("DB: CORRECT BR");
+		#endif
+		return(1);
+	}
+		
 	if (AT_RESP_ERR_NO_RESP == SendATCmdWaitResp("AT", 500, 100, "OK", 5)) {		//check power
     // there is no response => turn on the module
 		// generate turn on pulse
+		#ifdef DEBUG_ON
+			Serial.println("DB: NO RESP");
+		#endif
 		digitalWrite(GSM_ON, HIGH);
 		delay(1200);
 		digitalWrite(GSM_ON, LOW);
 		delay(5000);
 	}
 
+
 	if (AT_RESP_ERR_DIF_RESP == SendATCmdWaitResp("AT", 500, 100, "OK", 5)){		//check OK
+		#ifdef DEBUG_ON
+			Serial.println("DB: DIFF RESP");
+		#endif
 		for (int i=1;i<8;i++){
 			switch (i) {
 			case 1:
@@ -98,15 +100,28 @@ int GSM::begin(long baud_rate){
 				DebugPrint(buff, 0);
 			#endif
 				
-			_cell.print("AT+IPR=");
-			_cell.print(baud_rate);    
-			_cell.print("\r"); // send <CR>
-			delay(500);
-			_cell.begin(baud_rate);
-			delay(100);
+
 			if (AT_RESP_OK == SendATCmdWaitResp("AT", 500, 100, "OK", 5)){
+				#ifdef DEBUG_ON
+					Serial.println("DB: FOUND PREV BR");
+				#endif
+				_cell.print("AT+IPR=");
+				_cell.print(baud_rate);    
+				_cell.print("\r"); // send <CR>
+				delay(500);
+				_cell.begin(baud_rate);
+				delay(100);
+				if (AT_RESP_OK == SendATCmdWaitResp("AT", 500, 100, "OK", 5)){
+					#ifdef DEBUG_ON
+						Serial.println("DB: CONFIRMED BR");
+					#endif
+				}
+				turnedON=true;
 				break;					
-			}		  
+			}
+			#ifdef DEBUG_ON
+				Serial.println("DB: NO BR");
+			#endif			
 		}
 			  
 		// communication line is not used yet = free
@@ -120,10 +135,13 @@ int GSM::begin(long baud_rate){
 	// send collection of first initialization parameters for the GSM module    
 	InitParam(PARAM_SET_0);
 	InitParam(PARAM_SET_1);//configure the module  
-	Echo(0);               //enable AT echo 
+	Echo(0);               //enable AT echo
 	setStatus(READY);
 	//delay(10000);
-	return(1);
+	if(turnedON)
+		return(1);
+	else
+		return(0);
 }
 
 
@@ -139,7 +157,7 @@ void GSM::InitParam(byte group){
 		// switch off echo
 		SendATCmdWaitResp("ATE0", 500, 50, "OK", 5);
 		// setup fixed baud rate
-		SendATCmdWaitResp("AT+IPR=9600", 500, 50, "OK", 5);
+		//SendATCmdWaitResp("AT+IPR=9600", 500, 50, "OK", 5);
 		// setup mode
 		//SendATCmdWaitResp("AT#SELINT=1", 500, 50, "OK", 5);
 		// Switch ON User LED - just as signalization we are here
@@ -186,6 +204,7 @@ void GSM::InitParam(byte group){
 		InitSMSMemory();
 		// select phonebook memory storage
 		SendATCmdWaitResp("AT+CPBS=\"SM\"", 1000, 50, "OK", 5);
+		SendATCmdWaitResp("AT+CIPSHUT", 500, 50, "SHUT OK", 5);
 		break;
 	}
 }

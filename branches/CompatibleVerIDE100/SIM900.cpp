@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 28/12/2011.
+last modified 16/01/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -99,19 +99,28 @@ int SIMCOM900::sendSMS(const char* to, const char* msg)
 
 int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
 {
-
+	int i=0;
    delay(5000);
    
   _tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
   _cell << "AT+CIFSR\r";
   if(WaitResp(5000, 50, "ERROR")!=RX_FINISHED_STR_RECV){
+  	#ifdef DEBUG_ON
+		Serial.println("DB: ALREADY HAVE AN IP");
+	#endif
 	_cell << "AT+CIPCLOSE\r";
+	WaitResp(5000, 50, "ERROR");
 	delay(2000);
 	_cell << "AT+CIPSERVER=0\r";
+	WaitResp(5000, 50, "ERROR");
 	return 1;
   }
   else{
-//  _cell.flush();
+  _cell << "AT+CIPSHUT\r";
+	#ifdef DEBUG_ON
+		Serial.println("DB: STARTING NEW CONNECTION");
+	#endif
+   WaitResp(500, 50, "SHUT OK");
 
   _cell << "AT+CSTT=\"";
   _cell << domain;
@@ -121,7 +130,8 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
   _cell << dom2;
   _cell << "\"\r";
   
-  switch(WaitResp(5000, 50, "OK")){
+  switch(WaitResp(500, 50, "OK")){
+
 	case RX_TMOUT_ERR: 
 		return 0;
 	break;
@@ -129,10 +139,14 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
 		return 0; 
 	break;
   }
-  delay(1000);
+	#ifdef DEBUG_ON
+		Serial.println("DB: APN OK");
+	#endif
+	 delay(1000);
+	  
+	_cell << "AT+CIICR\r";
 
-  _cell << "AT+CIICR\r";
-  switch(WaitResp(5000, 50, "OK")){
+  switch(WaitResp(10000, 50, "OK")){
 	case RX_TMOUT_ERR: 
 		return 0; 
 	break;
@@ -140,33 +154,25 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
 		return 0; 
 	break;
   }
+  	#ifdef DEBUG_ON
+		Serial.println("DB: CONNECTION OK");
+	#endif
+
   delay(1000);
 
-/*
 
-  //Expect "OK". 
-  if(_tf.find("OK"))
-  {
-    setStatus(ATTACHED); 
-    delay(1000);
-    return 1;
-  }
-  else
-  {
-    //setStatus(ATTACHED); 
-    //delay(1000);
-    //return 1;
-
-    // In this case we dont know the modem mental position
-    setStatus(ERROR);
-    return 0;   
-  }*/
  _cell << "AT+CIFSR\r";
- if(WaitResp(5000, 50, "ERROR")==RX_FINISHED_STR_RECV)
-	return 0;
- setStatus(ATTACHED);
- delay(5000);
- return 1;
+ if(WaitResp(5000, 50, "ERROR")!=RX_FINISHED_STR_RECV){
+	#ifdef DEBUG_ON
+		Serial.println("DB: ASSIGNED AN IP");
+	#endif
+	setStatus(ATTACHED);
+	return 1;
+}
+	#ifdef DEBUG_ON
+		Serial.println("DB: NO IP AFTER CONNECTION");
+	#endif
+ return 0;
  }
 }
 
@@ -220,7 +226,9 @@ int SIMCOM900::connectTCP(const char* server, int port)
 		return 0; 
 	break;
   }
-  //Serial.println("RCVD INPUT");
+  #ifdef DEBUG_ON
+	Serial.println("DB: RECEIVED COMMAND");
+  #endif	
 
   switch(WaitResp(15000, 200, "CONNECT")){
 	case RX_TMOUT_ERR: 
@@ -230,8 +238,9 @@ int SIMCOM900::connectTCP(const char* server, int port)
 		return 0; 
 	break;
   }
-
-  //Serial.println("CONNECTED");
+  #ifdef DEBUG_ON
+	Serial.println("DB: CONNECTED");
+  #endif
   delay(3000);
   _cell << "AT+CIPSEND\r";
   switch(WaitResp(5000, 200, ">")){
@@ -243,7 +252,9 @@ int SIMCOM900::connectTCP(const char* server, int port)
 	break;
   }
 
-  Serial.println("MOD INVIO");
+  #ifdef DEBUG_ON
+	Serial.println("DB: MOD INVIO");
+  #endif
   delay(4000);
   return 1;
 }

@@ -4,9 +4,7 @@
 //#include "sms.h"
 //#include "call.h"
 
-//To change pins for Software Serial, use the two lines below.
-//#define _GSM_TXPIN_ 2
-//#define _GSM_RXPIN_ 3	
+//To change pins for Software Serial, use the two lines in GSM.cpp.
 
 //GSM Shield for Arduino
 //www.open-electronics.org
@@ -63,8 +61,8 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("TCP");
-      gsm.connectTCP("www.google.it",80);
+      Serial.println("SIGNAL QUALITY");
+      gsm.SimpleWrite("AT+CSQ");
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){

@@ -14,9 +14,16 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
     return 0;
   */
   
-  if(!gsm.connectTCP(server, port))
+  if(!gsm.connectTCP(server, port)){
+  	#ifdef DEBUG_ON
+		Serial.println("DB: NOT CONNECTED");
+	#endif	
     return 0;
-  
+	}
+	#ifdef DEBUG_ON
+		Serial.println("DB: TEST");
+	#endif	 
+	
   gsm.SimpleWrite("GET ");
   gsm.SimpleWrite(path);
   gsm.SimpleWrite(" HTTP/1.0\nHost: ");
@@ -24,7 +31,6 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
   gsm.SimpleWrite("\n");
   gsm.SimpleWrite("User-Agent: Arduino");
   gsm.SimpleWrite("\n\n");
-
   gsm.SimpleWrite(end_c);
 
   switch(gsm.WaitResp(10000, 100, "SEND")){
@@ -36,7 +42,9 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
 	break;
   }
 
-  Serial.println("SENT");
+  	#ifdef DEBUG_ON
+		Serial.println("DB: SENT");
+	#endif	
   int res= gsm.read(result, resultlength);
 
   //gsm.disconnectTCP();
@@ -50,15 +58,19 @@ int InetGSM::httpPOST(const char* server, int port, const char* path, const char
   char itoaBuffer[8];
   int num_char;
   
-  if (!gsm.connectTCP(server, port))
+  if (!gsm.connectTCP(server, port)){
     return 0;
+	#ifdef DEBUG_ON
+		Serial.println("DB: NOT CONNECTED");
+	#endif	
+	}
 
   
   strcpy(_buffer,"POST ");
   strcat(_buffer,path);
   strcat(_buffer," HTTP/1.0\nHost: ");
   strcat(_buffer,server);
-  //  strcat(_buffer,"\n\rUser-Agent: Mozilla/4.0\n\rContent-Length: ");
+  //strcat(_buffer,"\n\rUser-Agent: Mozilla/4.0\n\rContent-Length: ");
   strcat(_buffer,"\nContent-Length: ");
   itoa(strlen(parameters),itoaBuffer,10);  
   strcat(_buffer,itoaBuffer);

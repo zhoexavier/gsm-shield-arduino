@@ -4,25 +4,22 @@
 //#include "sms.h"
 //#include "call.h"
 
-//To change pins for Software Serial, use the two lines below.
-//#define _GSM_TXPIN_ 2
-//#define _GSM_RXPIN_ 3	
+//To change pins for Software Serial, use the two lines in GSM.cpp.
 
 //GSM Shield for Arduino
 //www.open-electronics.org
 //this code is based on the example of Arduino Labs.
 
-//Simple sketch to start a connection as server.
+//Simple sketch to start a connection as client.
 
 InetGSM inet;
 //CallGSM call;
 //SMSGSM sms;
 
-char msg[100];
+char msg[20];
 int numdata;
-char inSerial[30];
+char inSerial[50];
 int i=0;
-long lasttime;
 
 void setup() 
 {
@@ -40,45 +37,37 @@ void setup()
   if (gsm.attachGPRS("internet.wind", "", ""))
     Serial.println("status=ATTACHED");
   else Serial.println("status=ERROR");
-  delay(5000);
+  delay(10000);
   
   //Read IP address.
+  gsm.SimpleWrite("AT+CIFSR");
+  delay(5000);
   int i=0;
   while(i<20){
     gsm.SimpleRead();
     i++;
   }
-  delay(5000);
-  gsm.SimpleWrite("AT+CIFSR\r");
-  delay(5000); 
-  
-  //Tweet
-  //inet.tweet("*********************key************", "An Arduino at #cpes15");
 
   //TCP Server. Start the socket connection
   //as server on the assigned port.
   Serial.println(msg);
   delay(5000);
-  /*
   if (gsm.connectTCPServer(80))
     Serial.println("status=TCPSERVERWAIT");
   else Serial.println("ERROR in Server");
   lasttime=millis();
-  */
 };
 
 
 void loop(){
-  serialhwread();
-  serialswread();
+  //serialhwread();
+  //serialswread();
   //Check if there is an active connection.
-  /*
   if (gsm.connectedClient()){
     //Read and print the last message received.
     gsm.read(msg, 200);
     Serial.println(msg);
   }
-  */
 };
 
 /*
@@ -107,8 +96,8 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("TCP");
-      gsm.connectTCP("www.google.it",80);
+      Serial.println("SIGNAL QUALITY");
+      gsm.SimpleWrite("AT+CSQ");
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
