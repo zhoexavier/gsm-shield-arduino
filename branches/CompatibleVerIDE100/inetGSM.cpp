@@ -16,13 +16,10 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
   
   if(!gsm.connectTCP(server, port)){
   	#ifdef DEBUG_ON
-		Serial.println("DB: NOT CONNECTED");
+		Serial.println("DB:NOT CONN");
 	#endif	
     return 0;
-	}
-	#ifdef DEBUG_ON
-		Serial.println("DB: TEST");
-	#endif	 
+	} 
 	
   gsm.SimpleWrite("GET ");
   gsm.SimpleWrite(path);
@@ -43,7 +40,7 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
   }
 
   	#ifdef DEBUG_ON
-		Serial.println("DB: SENT");
+		Serial.println("DB:SENT");
 	#endif	
   int res= gsm.read(result, resultlength);
 
@@ -60,9 +57,6 @@ int InetGSM::httpPOST(const char* server, int port, const char* path, const char
   
   if (!gsm.connectTCP(server, port)){
     return 0;
-	#ifdef DEBUG_ON
-		Serial.println("DB: NOT CONNECTED");
-	#endif	
 	}
 
   
@@ -103,6 +97,7 @@ int InetGSM::tweet(const char* token, const char* msg)
 
 int InetGSM::openmail(char* server, char* loginbase64, char* passbase64, char* from, char* to, char* subj)
 {
+	/*
 	  if (!gsm.connectTCP(server, 25))
     	return 0;
     
@@ -128,6 +123,7 @@ int InetGSM::openmail(char* server, char* loginbase64, char* passbase64, char* f
     gsm.read(_buffer, BUFFERSIZE);
     gsm.SimpleWrite("Subject: ");gsm.SimpleWrite(subj);gsm.SimpleWrite("\n\n");
     return 1;
+	*/
 }
 int InetGSM::closemail()
 {

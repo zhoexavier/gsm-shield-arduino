@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 16/01/2012.
+last modified 17/01/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -106,7 +106,7 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
   _cell << "AT+CIFSR\r";
   if(WaitResp(5000, 50, "ERROR")!=RX_FINISHED_STR_RECV){
   	#ifdef DEBUG_ON
-		Serial.println("DB: ALREADY HAVE AN IP");
+		Serial.println("DB:ALREADY HAVE AN IP");
 	#endif
 	_cell << "AT+CIPCLOSE\r";
 	WaitResp(5000, 50, "ERROR");
@@ -118,7 +118,7 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
   else{
   _cell << "AT+CIPSHUT\r";
 	#ifdef DEBUG_ON
-		Serial.println("DB: STARTING NEW CONNECTION");
+		Serial.println("DB:STARTING NEW CONNECTION");
 	#endif
    WaitResp(500, 50, "SHUT OK");
 
@@ -140,7 +140,7 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
 	break;
   }
 	#ifdef DEBUG_ON
-		Serial.println("DB: APN OK");
+		Serial.println("DB:APN OK");
 	#endif
 	 delay(1000);
 	  
@@ -155,7 +155,7 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
 	break;
   }
   	#ifdef DEBUG_ON
-		Serial.println("DB: CONNECTION OK");
+		Serial.println("DB:CONNECTION OK");
 	#endif
 
   delay(1000);
@@ -164,13 +164,13 @@ int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
  _cell << "AT+CIFSR\r";
  if(WaitResp(5000, 50, "ERROR")!=RX_FINISHED_STR_RECV){
 	#ifdef DEBUG_ON
-		Serial.println("DB: ASSIGNED AN IP");
+		Serial.println("DB:ASSIGNED AN IP");
 	#endif
 	setStatus(ATTACHED);
 	return 1;
 }
 	#ifdef DEBUG_ON
-		Serial.println("DB: NO IP AFTER CONNECTION");
+		Serial.println("DB:NO IP AFTER CONNECTION");
 	#endif
  return 0;
  }
@@ -227,10 +227,10 @@ int SIMCOM900::connectTCP(const char* server, int port)
 	break;
   }
   #ifdef DEBUG_ON
-	Serial.println("DB: RECEIVED COMMAND");
+	Serial.println("DB:RECVD CMD");
   #endif	
 
-  switch(WaitResp(15000, 200, "CONNECT")){
+  switch(WaitResp(15000, 200, "OK")){
 	case RX_TMOUT_ERR: 
 		return 0;
 	break;
@@ -238,9 +238,11 @@ int SIMCOM900::connectTCP(const char* server, int port)
 		return 0; 
 	break;
   }
+
   #ifdef DEBUG_ON
-	Serial.println("DB: CONNECTED");
+	Serial.println("DB:OK TCP");
   #endif
+
   delay(3000);
   _cell << "AT+CIPSEND\r";
   switch(WaitResp(5000, 200, ">")){
@@ -253,7 +255,7 @@ int SIMCOM900::connectTCP(const char* server, int port)
   }
 
   #ifdef DEBUG_ON
-	Serial.println("DB: MOD INVIO");
+	Serial.println("DB:>");
   #endif
   delay(4000);
   return 1;

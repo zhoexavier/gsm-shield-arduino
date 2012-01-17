@@ -20,6 +20,9 @@ SMSGSM sms;
 
 char msg[200];
 int numdata;
+boolean started=false;
+char smsbuffer[160];
+char n[20];
 
 void setup() 
 {
@@ -28,26 +31,30 @@ void setup()
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(9600))
+  if (gsm.begin(2400)){
     Serial.println("\nstatus=READY");
+    started=true;  
+  }
   else Serial.println("\nstatus=IDLE");
   
-  //Enable this two lines if you want to send an SMS.
-  //if (sms.SendSMS("3471234567", "Arduino SMS"))
-    //Serial.println("\nSMS sent OK");
+  if(started){
+    //Enable this two lines if you want to send an SMS.
+    if (sms.SendSMS("3471234567", "Arduino SMS"))
+      Serial.println("\nSMS sent OK");
+  }
 
 };
 
 void loop() 
 {
-  char smsbuffer[160];
-  char n[20];
-  //Read if there are messages on SIM card and print them.
-  if(gsm.readSMS(smsbuffer, 160, n, 20))
-  {
-    Serial.println(n);
-    Serial.println(smsbuffer);
+  if(started){
+    //Read if there are messages on SIM card and print them.
+    if(gsm.readSMS(smsbuffer, 160, n, 20))
+    {
+      Serial.println(n);
+      Serial.println(smsbuffer);
+    }
+    delay(1000);
   }
-  delay(1000);
 };
 

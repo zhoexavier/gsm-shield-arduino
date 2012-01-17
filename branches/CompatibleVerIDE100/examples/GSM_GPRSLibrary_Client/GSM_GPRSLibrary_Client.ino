@@ -20,6 +20,7 @@ char msg[20];
 int numdata;
 char inSerial[50];
 int i=0;
+boolean started=false;
 
 void setup() 
 {
@@ -28,34 +29,38 @@ void setup()
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(2400))
+  if (gsm.begin(2400)){
     Serial.println("\nstatus=READY");
+    started=true;  
+  }
   else Serial.println("\nstatus=IDLE");
   
-  //GPRS attach, put in order APN, username and password.
-  //If no needed auth let them blank.
-  if (gsm.attachGPRS("internet.wind", "", ""))
-    Serial.println("status=ATTACHED");
-  else Serial.println("status=ERROR");
-  delay(10000);
+  if(started){
+    //GPRS attach, put in order APN, username and password.
+    //If no needed auth let them blank.
+    if (gsm.attachGPRS("internet.wind", "", ""))
+      Serial.println("status=ATTACHED");
+    else Serial.println("status=ERROR");
+    delay(1000);
+    
+    //Read IP address.
+    gsm.SimpleWrite("AT+CIFSR");
+    delay(5000);
+    int i=0;
+    while(i<20){
+      gsm.SimpleRead();
+      i++;
+    }
   
-  //Read IP address.
-  gsm.SimpleWrite("AT+CIFSR");
-  delay(5000);
-  int i=0;
-  while(i<20){
-    gsm.SimpleRead();
-    i++;
+    //TCP Client GET, send a GET request to the server and
+    //save the reply.
+    numdata=inet.httpGET("www.google.com", 80, "/", msg, 50);
+    //Print the results.
+    Serial.println("\nNumber of data received:");
+    Serial.println(numdata);  
+    Serial.println("\nData received:"); 
+    Serial.println(msg); 
   }
-
-  //TCP Client GET, send a GET request to the server and
-  //save the reply.
-  numdata=inet.httpGET("www.google.com", 80, "/", msg, 50);
-  //Print the results.
-  Serial.println("\nNumber of data received:");
-  Serial.println(numdata);  
-  Serial.println("Data received:"); 
-  Serial.println(msg); 
 };
 
 void loop() 
@@ -85,7 +90,7 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-        gsm.SimpleWrite("AT+CSQ");
+      gsm.SendATCmdWaitResp("ATE0", 500, 50, "OK", 5);
     }
 	
     //Read last message saved.

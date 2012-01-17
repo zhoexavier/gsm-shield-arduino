@@ -20,6 +20,8 @@ char msg[20];
 int numdata;
 char inSerial[50];
 int i=0;
+boolean started=false;
+long lasttime=millis();
 
 void setup() 
 {
@@ -28,55 +30,55 @@ void setup()
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(2400))
+  if (gsm.begin(2400)){
     Serial.println("\nstatus=READY");
+    started=true;  
+  }
   else Serial.println("\nstatus=IDLE");
   
-  //GPRS attach, put in order APN, username and password.
-  //If no needed auth let them blank.
-  if (gsm.attachGPRS("internet.wind", "", ""))
-    Serial.println("status=ATTACHED");
-  else Serial.println("status=ERROR");
-  delay(10000);
-  
-  //Read IP address.
-  gsm.SimpleWrite("AT+CIFSR");
-  delay(5000);
-  int i=0;
-  while(i<20){
-    gsm.SimpleRead();
-    i++;
-  }
+  if(started){
+    //GPRS attach, put in order APN, username and password.
+    //If no needed auth let them blank.
+    if (gsm.attachGPRS("internet.wind", "", ""))
+      Serial.println("status=ATTACHED");
+    else Serial.println("status=ERROR");
+    delay(1000);
+    
+    //Read IP address.
+    gsm.SimpleWrite("AT+CIFSR");
+    delay(5000);
+    int i=0;
+    while(i<20){
+      gsm.SimpleRead();
+      i++;
+    }
 
-  //TCP Server. Start the socket connection
-  //as server on the assigned port.
-  Serial.println(msg);
-  delay(5000);
-  if (gsm.connectTCPServer(80))
-    Serial.println("status=TCPSERVERWAIT");
-  else Serial.println("ERROR in Server");
-  lasttime=millis();
+    //TCP Server. Start the socket connection
+    //as server on the assigned port.
+    Serial.println(msg);
+    delay(5000);
+    if (gsm.connectTCPServer(80))
+      Serial.println("status=TCPSERVERWAIT");
+    else Serial.println("ERROR in Server");
+    lasttime=millis();
+  }
 };
 
 
 void loop(){
-  //serialhwread();
-  //serialswread();
-  //Check if there is an active connection.
-  if (gsm.connectedClient()){
-    //Read and print the last message received.
-    gsm.read(msg, 200);
-    Serial.println(msg);
+  if(started){
+    //Check if there is an active connection.
+    if (gsm.connectedClient()){
+      //Read and print the last message received.
+      gsm.read(msg, 200);
+      Serial.println(msg);
+    }
+  }
+  else{
+    serialhwread();
+    serialswread();
   }
 };
-
-/*
-void loop() 
-{
-  serialhwread();
-  serialswread();
-};
-*/
 
 void serialhwread(){
   i=0;

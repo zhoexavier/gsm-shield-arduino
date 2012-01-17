@@ -45,13 +45,13 @@ char SMSGSM::SendSMS(char *number_str, char *message_str)
     gsm.SimpleWrite("\"");
     
 	#ifdef DEBUG_ON
-		Serial.println("DEBUG: SMS TEST");
+		Serial.println("DEBUG:SMS TEST");
 	#endif
     // 1000 msec. for initial comm tmout
     // 50 msec. for inter character timeout
     if (RX_FINISHED_STR_RECV == gsm.WaitResp(1000, 500, ">")) {
 		#ifdef DEBUG_ON
-			Serial.println("DEBUG: RECEIVED >");
+			Serial.println("DEBUG:>");
 		#endif
       // send SMS text
       gsm.SimpleWriteWOln(message_str); 
