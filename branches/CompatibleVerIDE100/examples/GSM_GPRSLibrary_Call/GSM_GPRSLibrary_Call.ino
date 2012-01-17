@@ -46,7 +46,7 @@ void loop()
   //saved on SIM in the positions range from 1 to 3.
   if(stat==CALL_INCOM_VOICE_AUTH){
     //Hang up the call.
-    gsm.HangUp();
+    call.HangUp();
     //Check the value of the input.
     value=digitalRead(1);
     //Convert the int to a string.
