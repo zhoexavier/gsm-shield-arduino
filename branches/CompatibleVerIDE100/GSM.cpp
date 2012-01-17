@@ -17,11 +17,11 @@ based on QuectelM10 chip.
 #include "GSM.h"
 #include "WideTextFinder.h"
 
-#define _GSM_TXPIN_ 4
-#define _GSM_RXPIN_ 5
+//#define _GSM_TXPIN_ 4
+//#define _GSM_RXPIN_ 5
 
-//#define _GSM_TXPIN_ 2
-//#define _GSM_RXPIN_ 3	
+#define _GSM_TXPIN_ 2
+#define _GSM_RXPIN_ 3	
 
 GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE){
 };
@@ -35,18 +35,12 @@ int GSM::begin(long baud_rate){
 	_cell.begin(baud_rate);
 	setStatus(IDLE); 
 
-	if (AT_RESP_OK == SendATCmdWaitResp("AT", 500, 100, "OK", 5)){
-		#ifdef DEBUG_ON
-			Serial.println("DB:CORRECT BR");
-		#endif
-		turnedON=true;
-	}
 	
 	for (cont=0; cont<3; cont++){
 		if (AT_RESP_ERR_NO_RESP == SendATCmdWaitResp("AT", 500, 100, "OK", 5)&&!turnedON) {		//check power
 	    // there is no response => turn on the module
 			#ifdef DEBUG_ON
-				Serial.println("DB:DIFF RESP");
+				Serial.println("DB:NO RESP");
 			#endif
 			// generate turn on pulse
 			digitalWrite(GSM_ON, HIGH);
@@ -55,8 +49,20 @@ int GSM::begin(long baud_rate){
 			delay(10000);
 			norep=true;
 		}
+		else{
+			#ifdef DEBUG_ON
+				Serial.println("DB:ELSE");
+			#endif
+			norep=false;
+		}
 	}
-
+	
+	if (AT_RESP_OK == SendATCmdWaitResp("AT", 500, 100, "OK", 5)){
+		#ifdef DEBUG_ON
+			Serial.println("DB:CORRECT BR");
+		#endif
+		turnedON=true;
+	}
 	if(cont==3&&norep){
 		Serial.println("ERROR: SIM900 doesn't answer. Check power and serial pins in GSM.h");
 		return 0;
