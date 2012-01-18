@@ -237,7 +237,6 @@ void CallGSM::PickUp(void)
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   gsm.SimpleWrite("ATA");
-  gsm.SimpleWrite("\r");
   gsm.SetCommLineStatus(CLS_FREE);
 }
 
@@ -251,7 +250,6 @@ void CallGSM::HangUp(void)
   //if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   gsm.SimpleWrite("ATH");
-  gsm.SimpleWrite("\r");
   gsm.SetCommLineStatus(CLS_FREE);
 }
 
@@ -267,8 +265,8 @@ void CallGSM::Call(char *number_string)
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   // ATDxxxxxx;<CR>
-  gsm.SimpleWrite("ATD");
-  gsm.SimpleWrite(number_string);    
+  gsm.SimpleWriteWOln("ATD");
+  gsm.SimpleWriteWOln(number_string);    
   gsm.SimpleWrite(";\r");
   // 10 sec. for initial comm tmout
   // 50 msec. for inter character timeout
@@ -287,7 +285,7 @@ void CallGSM::Call(int sim_position)
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   // ATD>"SM" 1;<CR>
-  gsm.SimpleWrite("ATD>\"SM\" ");
+  gsm.SimpleWriteWOln("ATD>\"SM\" ");
   //gsm.SimpleWrite(sim_position);     IT NEEDS TO BE SOLVED!!!
   gsm.SimpleWrite(";\r");
 
