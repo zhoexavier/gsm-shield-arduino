@@ -286,7 +286,7 @@ void CallGSM::Call(int sim_position)
   gsm.SetCommLineStatus(CLS_ATCMD);
   // ATD>"SM" 1;<CR>
   gsm.SimpleWriteWOln("ATD>\"SM\" ");
-  //gsm.SimpleWrite(sim_position);     IT NEEDS TO BE SOLVED!!!
+  gsm.SimpleWriteWOln(sim_position);
   gsm.SimpleWrite(";\r");
 
   // 10 sec. for initial comm tmout

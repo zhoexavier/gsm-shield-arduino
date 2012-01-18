@@ -33,8 +33,10 @@ class SIMCOM900 : public virtual GSM
     void WhileSimpleRead();
     void SimpleWrite(char *comm);
     void SimpleWrite(char const *comm);
-	void SimpleWriteWOln(char *comm);
     void SimpleWrite(int comm);
+    void SimpleWriteWOln(char *comm);
+    void SimpleWriteWOln(char const *comm);
+    void SimpleWriteWOln(int comm);
 };
 
 extern SIMCOM900 gsm;

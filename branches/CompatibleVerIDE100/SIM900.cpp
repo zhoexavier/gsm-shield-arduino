@@ -582,6 +582,16 @@ void SIMCOM900::SimpleWriteWOln(char *comm)
 	_cell.print(comm);
 }
 
+void SIMCOM900::SimpleWriteWOln(char const *comm)
+{
+	_cell.print(comm);
+}
+
+void SIMCOM900::SimpleWriteWOln(int comm)
+{
+	_cell.print(comm);
+}
+
 void SIMCOM900::WhileSimpleRead()
 {
 	char datain;
