@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 17/01/2012.
+last modified 18/01/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -17,11 +17,11 @@ based on QuectelM10 chip.
 #include "GSM.h"
 #include "WideTextFinder.h"
 
-#define _GSM_TXPIN_ 4
-#define _GSM_RXPIN_ 5
+//#define _GSM_TXPIN_ 4
+//#define _GSM_RXPIN_ 5
 
-//#define _GSM_TXPIN_ 2
-//#define _GSM_RXPIN_ 3	
+#define _GSM_TXPIN_ 2
+#define _GSM_RXPIN_ 3	
 
 GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE){
 };

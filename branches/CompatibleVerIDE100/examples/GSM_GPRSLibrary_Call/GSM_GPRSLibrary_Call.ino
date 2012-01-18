@@ -47,6 +47,7 @@ void loop()
   if(stat==CALL_INCOM_VOICE_AUTH){
     //Hang up the call.
     call.HangUp();
+    delay(2000);
     //Check the value of the input.
     value=digitalRead(1);
     //Convert the int to a string.

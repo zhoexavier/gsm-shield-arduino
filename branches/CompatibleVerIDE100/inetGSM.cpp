@@ -3,6 +3,8 @@
 
 int InetGSM::httpGET(const char* server, int port, const char* path, char* result, int resultlength)
 {
+  boolean connected=false;
+  int n_of_at=0;
   int length_write;
   char end_c[2];
   end_c[0]=0x1a;
@@ -13,13 +15,20 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
   if(gsm.getStatus()!=GSM::ATTACHED)
     return 0;
   */
-  
-  if(!gsm.connectTCP(server, port)){
-  	#ifdef DEBUG_ON
-		Serial.println("DB:NOT CONN");
-	#endif	
-    return 0;
-	} 
+  while(n_of_at<3){
+	  if(!gsm.connectTCP(server, port)){
+	  	#ifdef DEBUG_ON
+			Serial.println("DB:NOT CONN");
+		#endif	
+	    	n_of_at++;
+	  }
+	  else{
+		connected=true;
+		n_of_at=3;
+	}
+  }
+
+  if(!connected) return 0;
 	
   gsm.SimpleWrite("GET ");
   gsm.SimpleWrite(path);
@@ -52,6 +61,7 @@ int InetGSM::httpGET(const char* server, int port, const char* path, char* resul
 
 int InetGSM::httpPOST(const char* server, int port, const char* path, const char* parameters, char* result, int resultlength)
 {
+	/*
   char itoaBuffer[8];
   int num_char;
   
@@ -81,6 +91,7 @@ int InetGSM::httpPOST(const char* server, int port, const char* path, const char
 
   gsm.disconnectTCP();
   //return res;
+	*/
    return 1;
 }
 /*
@@ -127,8 +138,10 @@ int InetGSM::openmail(char* server, char* loginbase64, char* passbase64, char* f
 }
 int InetGSM::closemail()
 {
+	/*
 	gsm.SimpleWrite("\n.\n");
 	gsm.disconnectTCP();
 	return 1;
+	*/
 }
  
