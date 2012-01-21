@@ -10,7 +10,7 @@
 //www.open-electronics.org
 //this code is based on the example of Arduino Labs.
 
-//Simple sketch to start a connection as client.
+//Simple sketch to start a connection as server.
 
 InetGSM inet;
 //CallGSM call;

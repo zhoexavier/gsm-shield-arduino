@@ -46,11 +46,8 @@ void setup()
     //Read IP address.
     gsm.SimpleWrite("AT+CIFSR");
     delay(5000);
-    int i=0;
-    while(i<20){
-      gsm.SimpleRead();
-      i++;
-    }
+    //Read until serial buffer is empty.
+    gsm.WhileSimpleRead();
   
     //TCP Client GET, send a GET request to the server and
     //save the reply.

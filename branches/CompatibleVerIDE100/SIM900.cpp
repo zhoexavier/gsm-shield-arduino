@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 18/01/2012.
+last modified 21/01/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -602,21 +602,6 @@ void SIMCOM900::WhileSimpleRead()
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //---------------------------------------------
 /**********************************************************

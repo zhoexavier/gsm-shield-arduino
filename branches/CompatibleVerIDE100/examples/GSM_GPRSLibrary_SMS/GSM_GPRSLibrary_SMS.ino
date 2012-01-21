@@ -39,8 +39,8 @@ void setup()
   
   if(started){
     //Enable this two lines if you want to send an SMS.
-    if (sms.SendSMS("3471234567", "Arduino SMS"))
-      Serial.println("\nSMS sent OK");
+    //if (sms.SendSMS("3471234567", "Arduino SMS"))
+      //Serial.println("\nSMS sent OK");
   }
 
 };
