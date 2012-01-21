@@ -17,7 +17,6 @@ byte CallGSM::CallStatus(void)
   if (CLS_FREE != gsm.GetCommLineStatus()) return (CALL_COMM_LINE_BUSY);
   gsm.SetCommLineStatus(CLS_ATCMD);
   gsm.SimpleWrite("AT+CPAS");
-  gsm.SimpleWrite("\r");
 
   // 5 sec. for initial comm tmout
   // 50 msec. for inter character timeout
@@ -103,7 +102,6 @@ byte CallGSM::CallStatusWithAuth(char *phone_number,
   if (CLS_FREE != gsm.GetCommLineStatus()) return (CALL_COMM_LINE_BUSY);
   gsm.SetCommLineStatus(CLS_ATCMD);
   gsm.SimpleWrite("AT+CLCC");
-  gsm.SimpleWrite("\r");
 
   // 5 sec. for initial comm tmout
   // and max. 1500 msec. for inter character timeout
