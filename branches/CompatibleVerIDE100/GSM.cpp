@@ -64,7 +64,7 @@ int GSM::begin(long baud_rate){
 		turnedON=true;
 	}
 	if(cont==3&&norep){
-		Serial.println("ERROR: SIM900 doesn't answer. Check power and serial pins in GSM.h");
+		Serial.println("ERROR: SIM900 doesn't answer. Check power and serial pins in GSM.cpp");
 		return 0;
 	}
 
