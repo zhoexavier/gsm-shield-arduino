@@ -267,7 +267,7 @@ void CallGSM::Call(char *number_string)
   // ATDxxxxxx;<CR>
   gsm.SimpleWriteWOln("ATD");
   gsm.SimpleWriteWOln(number_string);    
-  gsm.SimpleWrite(";\r");
+  gsm.SimpleWrite(";");
   // 10 sec. for initial comm tmout
   // 50 msec. for inter character timeout
   gsm.WaitResp(10000, 50);
@@ -287,7 +287,7 @@ void CallGSM::Call(int sim_position)
   // ATD>"SM" 1;<CR>
   gsm.SimpleWriteWOln("ATD>\"SM\" ");
   gsm.SimpleWriteWOln(sim_position);
-  gsm.SimpleWrite(";\r");
+  gsm.SimpleWrite(";");
 
   // 10 sec. for initial comm tmout
   // 50 msec. for inter character timeout
