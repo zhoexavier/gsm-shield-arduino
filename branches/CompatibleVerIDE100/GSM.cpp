@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 21/01/2012.
+last modified 22/01/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -17,9 +17,13 @@ based on QuectelM10 chip.
 #include "GSM.h"
 #include "WideTextFinder.h"
 
+//De-comment this two lines below if you have the
+//first version of GSM GPRS Shield
 //#define _GSM_TXPIN_ 4
 //#define _GSM_RXPIN_ 5
 
+//De-comment this two lines below if you have the
+//second version og GSM GPRS Shield
 #define _GSM_TXPIN_ 2
 #define _GSM_RXPIN_ 3	
 
