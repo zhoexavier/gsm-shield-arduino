@@ -1,7 +1,7 @@
 #ifndef _INETGSM_H_
 #define _INETGSM_H_
 
-#define BUFFERSIZE 50
+#define BUFFERSIZE 1
 
 #include "SIM900.h"
 
