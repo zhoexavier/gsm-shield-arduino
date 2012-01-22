@@ -16,7 +16,7 @@ byte CallGSM::CallStatus(void)
 
   if (CLS_FREE != gsm.GetCommLineStatus()) return (CALL_COMM_LINE_BUSY);
   gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWrite("AT+CPAS");
+  gsm.SimpleWriteln("AT+CPAS");
 
   // 5 sec. for initial comm tmout
   // 50 msec. for inter character timeout
@@ -101,7 +101,7 @@ byte CallGSM::CallStatusWithAuth(char *phone_number,
   phone_number[0] = 0x00;  // no phonr number so far
   if (CLS_FREE != gsm.GetCommLineStatus()) return (CALL_COMM_LINE_BUSY);
   gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWrite("AT+CLCC");
+  gsm.SimpleWriteln("AT+CLCC");
 
   // 5 sec. for initial comm tmout
   // and max. 1500 msec. for inter character timeout
@@ -234,7 +234,7 @@ void CallGSM::PickUp(void)
 {
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWrite("ATA");
+  gsm.SimpleWriteln("ATA");
   gsm.SetCommLineStatus(CLS_FREE);
 }
 
@@ -247,7 +247,7 @@ void CallGSM::HangUp(void)
 {
   //if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWrite("ATH");
+  gsm.SimpleWriteln("ATH");
   gsm.SetCommLineStatus(CLS_FREE);
 }
 
@@ -263,9 +263,9 @@ void CallGSM::Call(char *number_string)
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   // ATDxxxxxx;<CR>
-  gsm.SimpleWriteWOln("ATD");
-  gsm.SimpleWriteWOln(number_string);    
-  gsm.SimpleWrite(";");
+  gsm.SimpleWrite("ATD");
+  gsm.SimpleWrite(number_string);    
+  gsm.SimpleWriteln(";");
   // 10 sec. for initial comm tmout
   // 50 msec. for inter character timeout
   gsm.WaitResp(10000, 50);
@@ -283,9 +283,9 @@ void CallGSM::Call(int sim_position)
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   // ATD>"SM" 1;<CR>
-  gsm.SimpleWriteWOln("ATD>\"SM\" ");
-  gsm.SimpleWriteWOln(sim_position);
-  gsm.SimpleWrite(";");
+  gsm.SimpleWrite("ATD>\"SM\" ");
+  gsm.SimpleWrite(sim_position);
+  gsm.SimpleWriteln(";");
 
   // 10 sec. for initial comm tmout
   // 50 msec. for inter character timeout

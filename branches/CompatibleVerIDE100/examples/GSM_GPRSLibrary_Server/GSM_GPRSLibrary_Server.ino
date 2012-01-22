@@ -16,7 +16,7 @@ InetGSM inet;
 //CallGSM call;
 //SMSGSM sms;
 
-char msg[20];
+char msg[50];
 int numdata;
 char inSerial[50];
 int i=0;
@@ -45,7 +45,7 @@ void setup()
     delay(1000);
     
     //Read IP address.
-    gsm.SimpleWrite("AT+CIFSR");
+    gsm.SimpleWriteln("AT+CIFSR");
     delay(5000);
     int i=0;
     while(i<20){
@@ -70,7 +70,7 @@ void loop(){
     //Check if there is an active connection.
     if (gsm.connectedClient()){
       //Read and print the last message received.
-      gsm.read(msg, 200);
+      gsm.read(msg, 50);
       Serial.println(msg);
     }
   }
@@ -94,23 +94,21 @@ void serialhwread(){
       Serial.println("_");
       inSerial[0]=0x1a;
       inSerial[1]='\0';
-      gsm.SimpleWrite(inSerial);
+      gsm.SimpleWriteln(inSerial);
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
       Serial.println("SIGNAL QUALITY");
-      gsm.SimpleWrite("AT+CSQ");
+      gsm.SimpleWriteln("AT+CSQ");
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
       Serial.println(msg);
     }
-    
     else{
       Serial.println(inSerial);
-      gsm.SimpleWrite(inSerial);
+      gsm.SimpleWriteln(inSerial);
     }    
-    
     inSerial[0]='\0';
   }
 }

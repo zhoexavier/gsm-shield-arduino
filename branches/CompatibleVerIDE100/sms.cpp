@@ -40,9 +40,9 @@ char SMSGSM::SendSMS(char *number_str, char *message_str)
   for (i = 0; i < 1; i++) {
     // send  AT+CMGS="number_str"
     
-    gsm.SimpleWriteWOln("AT+CMGS=\"");
-    gsm.SimpleWriteWOln(number_str);  
-    gsm.SimpleWrite("\"");
+    gsm.SimpleWrite("AT+CMGS=\"");
+    gsm.SimpleWrite(number_str);  
+    gsm.SimpleWriteln("\"");
     
 	#ifdef DEBUG_ON
 		Serial.println("DEBUG:SMS TEST");
@@ -54,8 +54,8 @@ char SMSGSM::SendSMS(char *number_str, char *message_str)
 			Serial.println("DEBUG:>");
 		#endif
       // send SMS text
-      gsm.SimpleWriteWOln(message_str); 
-      gsm.SimpleWrite(end);
+      gsm.SimpleWrite(message_str); 
+      gsm.SimpleWriteln(end);
 	  //_cell.flush(); // erase rx circular buffer
       if (RX_FINISHED_STR_RECV == gsm.WaitResp(7000, 5000, "+CMGS")) {
         // SMS was send correctly 
@@ -171,13 +171,13 @@ char SMSGSM::IsSMSPresent(byte required_status)
 
   switch (required_status) {
     case SMS_UNREAD:
-      gsm.SimpleWrite("AT+CMGL=\"REC UNREAD\"\r");
+      gsm.SimpleWriteln("AT+CMGL=\"REC UNREAD\"");
       break;
     case SMS_READ:
-      gsm.SimpleWrite("AT+CMGL=\"REC READ\"\r");
+      gsm.SimpleWriteln("AT+CMGL=\"REC READ\"");
       break;
     case SMS_ALL:
-      gsm.SimpleWrite("AT+CMGL=\"ALL\"\r");
+      gsm.SimpleWriteln("AT+CMGL=\"ALL\"");
       break;
   }
 
@@ -297,8 +297,7 @@ char SMSGSM::GetSMS(byte position, char *phone_number, char *SMS_text, byte max_
   
   //send "AT+CMGR=X" - where X = position
   gsm.SimpleWrite("AT+CMGR=");
-  gsm.SimpleWrite((int)position);  
-  gsm.SimpleWrite("\r");
+  gsm.SimpleWriteln((int)position);  
 
   // 5000 msec. for initial comm tmout
   // 100 msec. for inter character tmout
@@ -541,8 +540,7 @@ char SMSGSM::DeleteSMS(byte position)
   
   //send "AT+CMGD=XY" - where XY = position
   gsm.SimpleWrite("AT+CMGD=");
-  gsm.SimpleWrite((int)position);  
-  gsm.SimpleWrite("\r");
+  gsm.SimpleWriteln((int)position);  
 
 
   // 5000 msec. for initial comm tmout

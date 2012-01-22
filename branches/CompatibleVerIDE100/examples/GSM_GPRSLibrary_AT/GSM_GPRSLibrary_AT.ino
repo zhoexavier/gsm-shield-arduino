@@ -16,7 +16,6 @@
 //CallGSM call;
 //SMSGSM sms;
 
-char msg[150];
 int numdata;
 char inSerial[40];
 int i=0;
@@ -57,23 +56,17 @@ void serialhwread(){
       Serial.println("_");
       inSerial[0]=0x1a;
       inSerial[1]='\0';
-      gsm.SimpleWrite(inSerial);
+      gsm.SimpleWriteln(inSerial);
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
       Serial.println("SIGNAL QUALITY");
-      gsm.SimpleWrite("AT+CSQ");
-    }
-    //Read last message saved.
-    if(!strcmp(inSerial,"MSG")){
-      Serial.println(msg);
-    }
-    
+      gsm.SimpleWriteln("AT+CSQ");
+    } 
     else{
       Serial.println(inSerial);
-      gsm.SimpleWrite(inSerial);
+      gsm.SimpleWriteln(inSerial);
     }    
-    
     inSerial[0]='\0';
   }
 }

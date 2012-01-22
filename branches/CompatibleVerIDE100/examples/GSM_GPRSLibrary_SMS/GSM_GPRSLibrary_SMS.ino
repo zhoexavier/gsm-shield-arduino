@@ -18,7 +18,6 @@ SMSGSM sms;
 
 //Simple sketch to send and receive SMS.
 
-char msg[200];
 int numdata;
 boolean started=false;
 char smsbuffer[160];
@@ -57,4 +56,3 @@ void loop()
     delay(1000);
   }
 };
-

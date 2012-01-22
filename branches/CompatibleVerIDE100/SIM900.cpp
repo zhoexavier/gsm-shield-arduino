@@ -564,32 +564,32 @@ void SIMCOM900::SimpleRead()
 
 void SIMCOM900::SimpleWrite(char *comm)
 {
-	_cell.println(comm);
+	_cell.print(comm);
 }
 
 void SIMCOM900::SimpleWrite(const char *comm)
 {
-	_cell.println(comm);
+	_cell.print(comm);
 }
 
 void SIMCOM900::SimpleWrite(int comm)
 {
+	_cell.print(comm);
+}
+
+void SIMCOM900::SimpleWriteln(char *comm)
+{
 	_cell.println(comm);
 }
 
-void SIMCOM900::SimpleWriteWOln(char *comm)
+void SIMCOM900::SimpleWriteln(char const *comm)
 {
-	_cell.print(comm);
+	_cell.println(comm);
 }
 
-void SIMCOM900::SimpleWriteWOln(char const *comm)
+void SIMCOM900::SimpleWriteln(int comm)
 {
-	_cell.print(comm);
-}
-
-void SIMCOM900::SimpleWriteWOln(int comm)
-{
-	_cell.print(comm);
+	_cell.println(comm);
 }
 
 void SIMCOM900::WhileSimpleRead()
