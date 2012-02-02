@@ -36,9 +36,11 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	char ret_val=0;
 	char *p_char; 
 	char *p_char1;
-	gsm.SimpleWrite("AT+CGPSPWR=0");
+	gsm.SimpleWrite("AT+CGPSINF=0");
 	if(gsm.IsStringReceived("OK"))
 		ret_val=1;
+		
+	//longitude
 	p_char = strchr((char *)(gsm.comm_buf),',');
 	p_char1 = p_char+1;  //we are on the first char of longitude
 	p_char = strchr((char *)(p_char), ',');
@@ -50,6 +52,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
     }
 	strcpy(str_long, (char *)(p_char1));
 	
+	//latitude
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
@@ -58,8 +61,9 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
           // of next strcpy() function
           *p_char1 = 0; 
     }	
-	strcpy(str_lat, (char *)(p_char1));
+	strcpy(str_lat, (char *)(p_char));
 	
+	//altitude
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
@@ -68,8 +72,9 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
           // of next strcpy() function
           *p_char = 0; 
     }	
-	strcpy(str_alt, (char *)(p_char));
+	strcpy(str_alt, (char *)(p_char1));
 	
+	//UTC time
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
@@ -78,8 +83,9 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
           // of next strcpy() function
           *p_char1 = 0; 
     }	
-	strcpy(str_time, (char *)(p_char1));	
+	strcpy(str_time, (char *)(p_char));	
 
+	//TTFF
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
@@ -88,7 +94,26 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
           // of next strcpy() function
           *p_char = 0; 
     }	
-	strcpy(str_speed, (char *)(p_char));	
-	
+
+	//num
+	p_char++;
+	p_char1 = strchr((char *)(p_char), ',');
+	if (p_char1 != NULL) {
+          // finish the SMS text string 
+          // because string must be finished for right behaviour 
+          // of next strcpy() function
+          *p_char1 = 0; 
+    }	
+
+	//speed
+	p_char1++;
+	p_char = strchr((char *)(p_char1), ',');
+	if (p_char != NULL) {
+          // finish the SMS text string 
+          // because string must be finished for right behaviour 
+          // of next strcpy() function
+          *p_char = 0; 
+    }		
+	strcpy(str_speed, (char *)(p_char1));	
 	return ret_val;
 }

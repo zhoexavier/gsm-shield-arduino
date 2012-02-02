@@ -56,7 +56,7 @@ void setup()
 		Serial.println("GPS OFF");
 	else if(stat==2)
 		Serial.println("2D FIXED");
-	else if(stat==2)
+	else if(stat==3)
 		Serial.println("3D FIXED");
 	delay(5000);
 	//Get data from GPS
