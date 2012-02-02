@@ -1,15 +1,17 @@
-/*
- GSM.h - library for the GSM Playground - GSM Shield for Arduino
- Released under the Creative Commons Attribution-Share Alike 3.0 License
- http://www.creativecommons.org/licenses/by-sa/3.0/
- www.hwkitchen.com
-*/
-#ifndef __GSM_Shield
-#define __GSM_Shield
+#ifndef GSM_H
+#define GSM_H
 
-#include "WProgram.h"
-#include "NewSoftSerial.h"
+#include <NewSoftSerial.h>
+#include <inttypes.h>
+#include "WideTextFinder.h"
 
+
+#define ctrlz 26 //Ascii character for ctr+z. End of a SMS.
+#define cr    13 //Ascii character for carriage return. 
+#define lf    10 //Ascii character for line feed. 
+#define ctrlz 26 //Ascii character for ctr+z. End of a SMS.
+#define cr    13 //Ascii character for carriage return. 
+#define lf    10 //Ascii character for line feed.
 #define GSM_LIB_VERSION 101 // library version X.YY (e.g. 1.00)
 
 // if defined - debug print is enabled with possibility to print out 
@@ -60,6 +62,9 @@
 #define STATUS_REGISTERED           2
 #define STATUS_USER_BUTTON_ENABLE   4
 
+// GPRS status
+#define CHECK_AND_OPEN    0
+#define CLOSE_AND_REOPEN  1
 
 
 
@@ -149,110 +154,12 @@ enum getsms_ret_val_enum
 class GSM
 {
   public:
+    enum GSM_st_e { ERROR, IDLE, READY, ATTACHED, TCPSERVERWAIT, TCPCONNECTEDSERVER, TCPCONNECTEDCLIENT };
     byte comm_buf[COMM_BUF_LEN+1];  // communication buffer +1 for 0x00 termination
-
-    // library version
-    int LibVer(void);
-    // constructor
-    GSM(void);
-    // serial line initialization
-    //void InitSerLine(long baud_rate);
-    // set comm. line status
-    inline void SetCommLineStatus(byte new_status) {comm_line_status = new_status;};
-    // get comm. line status
-    inline byte GetCommLineStatus(void) {return comm_line_status;};
-
-
-    // turns on GSM module
-    void TurnOn(long baud_rate);
-    // sends some initialization parameters
     void InitParam (byte group);
-    // enables DTMF decoder
-    //void EnableDTMF(void);
-    // gets DTMF value
-    //byte GetDTMFSignal(void);
-    // turns off/on the speaker
-    void SetSpeaker(byte off_on);
-    // checks if module is registered in the GSM network
-    // must be called regularly
-    byte CheckRegistration(void);
-    // returns registration state
-    byte IsRegistered(void);
-    // returns whether complete initialization was made
-    byte IsInitialized(void);
-    // finds out the status of call
-    byte CallStatus(void);
-    byte CallStatusWithAuth(char *phone_number,
-                            byte first_authorized_pos, byte last_authorized_pos);
-    // picks up an incoming call
-    void PickUp(void);
-    // hangs up an incomming call
-    void HangUp(void);
-    // calls the specific number
-    void Call(char *number_string);
-    // makes a call to the number stored at the specified SIM position
-    void Call(int sim_position);
-
-    // Speaker volume methods - set, increase, decrease
-    char SetSpeakerVolume(byte speaker_volume);
-    char IncSpeakerVolume(void);
-    char DecSpeakerVolume(void);
-
-    // sends DTMF signal
-    char SendDTMFSignal(byte dtmf_tone);
-
-    // User button methods
-    inline byte IsUserButtonEnable(void) {return (module_status & STATUS_USER_BUTTON_ENABLE);};
-    inline void DisableUserButton(void) {module_status &= ~STATUS_USER_BUTTON_ENABLE;};
-    inline void EnableUserButton(void) {module_status |= STATUS_USER_BUTTON_ENABLE;};
-    byte IsUserButtonPushed(void);  
-
-
-    // SMS's methods 
-    char SendSMS(char *number_str, char *message_str);
-    char SendSMS(byte sim_phonebook_position, char *message_str);
-    char IsSMSPresent(byte required_status);
-    char GetSMS(byte position, char *phone_number, char *SMS_text, byte max_SMS_len);
-    char GetAuthorizedSMS(byte position, char *phone_number, char *SMS_text, byte max_SMS_len,
-                          byte first_authorized_pos, byte last_authorized_pos);
-    char DeleteSMS(byte position);
-
-    // Phonebook's methods
-    char GetPhoneNumber(byte position, char *phone_number);
-    char WritePhoneNumber(byte position, char *phone_number);
-	char DelPhoneNumber(byte position);
-    char ComparePhoneNumber(byte position, char *phone_number);
-
-
-    // routines regarding communication with the GSM module
-    void RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
-    byte IsRxFinished(void);
-    byte IsStringReceived(char const *compare_string);
-    byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
-    byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout, 
-                  char const *expected_resp_string);
-    char SendATCmdWaitResp(char const *AT_cmd_string,
-               uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
-               char const *response_string,
-               byte no_of_attempts);
-			   
-	// new routine  TDGINO by Boris
-	
-	//echo
-	void Echo(byte state);
-
-
-    // debug methods
-#ifdef DEBUG_LED_ENABLED
-    void BlinkDebugLED (byte num_of_blink);
-#endif
-
-#ifdef DEBUG_PRINT
-    void DebugPrint(const char *string_to_print, byte last_debug_print);
-    void DebugPrint(int number_to_print, byte last_debug_print);
-#endif
 
   private:
+    int _status;
     byte comm_line_status;
 
     // global status - bits are used for representation of states
@@ -269,7 +176,112 @@ class GSM
 
     // last value of speaker volume
     byte last_speaker_volume; 
-
     char InitSMSMemory(void);
+
+  protected:
+    NewSoftSerial _cell;
+    WideTextFinder _tf;
+    inline void setStatus(GSM_st_e status) { _status = status; }
+    virtual int setPIN(char *pin);
+    int isIP(const char* cadena);
+
+  public:
+    GSM();
+    inline int getStatus(){   return _status; };
+    //int begin(char* pin=0);
+    int begin(long baud_rate);
+    virtual int restart(char* pin=0);
+    virtual int start(char* pin=0);
+    virtual int shutdown();
+    virtual int getCCI(char* cci);
+    virtual int getIMEI(char* imei);
+
+    virtual int sendSMS(const char* to, const char* msg);
+    virtual boolean availableSMS();
+    virtual boolean readSMS(char* msg, int msglength, char* number, int nlength);
+    virtual boolean readCall(char* number, int nlength);
+    virtual boolean call(char* number, unsigned int milliseconds);
+    virtual int attachGPRS(char* domain, char* dom1, char* dom2);
+    virtual int dettachGPRS();
+    virtual int connectTCP(const char* server, int port);
+    virtual int disconnectTCP();
+    virtual int connectTCPServer(int port);
+    virtual boolean connectedClient();
+    virtual int readCellData(int &mcc, int &mnc, long &lac, long &cellid);
+    virtual int write(uint8_t c);
+    virtual int write(const char* str);
+    virtual int write(const uint8_t* buffer, size_t sz);
+    virtual int read(char* result, int resultlength);
+    virtual uint8_t read();
+
+    inline void SetCommLineStatus(byte new_status) {comm_line_status = new_status;};
+    inline byte GetCommLineStatus(void) {return comm_line_status;};
+
+    void RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
+    byte IsRxFinished(void);
+    byte IsStringReceived(char const *compare_string);
+    byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
+    byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout, 
+                  char const *expected_resp_string);
+    char SendATCmdWaitResp(char const *AT_cmd_string,
+               uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
+               char const *response_string,
+               byte no_of_attempts);
+	void Echo(byte state);
+
+
+	//-----------------------
+		// turns off/on the speaker
+    		void SetSpeaker(byte off_on);
+    		// checks if module is registered in the GSM network
+		// must be called regularly
+    		byte CheckRegistration(void);
+
+
+    // Speaker volume methods - set, increase, decrease
+/*
+    char SetSpeakerVolume(byte speaker_volume);
+    char IncSpeakerVolume(void);
+    char DecSpeakerVolume(void);
+
+    // sends DTMF signal
+    char SendDTMFSignal(byte dtmf_tone);
+*/
+
+    // User button methods
+    inline byte IsUserButtonEnable(void) {return (module_status & STATUS_USER_BUTTON_ENABLE);};
+    inline void DisableUserButton(void) {module_status &= ~STATUS_USER_BUTTON_ENABLE;};
+    inline void EnableUserButton(void) {module_status |= STATUS_USER_BUTTON_ENABLE;};
+    byte IsUserButtonPushed(void);  
+
+
+
+    // Phonebook's methods
+
+char GetPhoneNumber(byte position, char *phone_number);
+    char WritePhoneNumber(byte position, char *phone_number);
+	char DelPhoneNumber(byte position);
+    char ComparePhoneNumber(byte position, char *phone_number);
+
+
+
+    // returns registration state
+    byte IsRegistered(void);
+    // returns whether complete initialization was made
+    byte IsInitialized(void);
+	//-----------------------
+
+    // debug methods
+#ifdef DEBUG_LED_ENABLED
+    void BlinkDebugLED (byte num_of_blink);
+#endif
+
+#ifdef DEBUG_PRINT
+    void DebugPrint(const char *string_to_print, byte last_debug_print);
+    void DebugPrint(int number_to_print, byte last_debug_print);
+#endif
+    
+
 };
+
 #endif
