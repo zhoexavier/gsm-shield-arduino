@@ -39,7 +39,7 @@ void setup()
   if(started){
     //GPRS attach, put in order APN, username and password.
     //If no needed auth let them blank.
-    if (gsm.attachGPRS("internet.wind", "", ""))
+    if (inet.attachGPRS("internet.wind", "", ""))
       Serial.println("status=ATTACHED");
     else Serial.println("status=ERROR");
     delay(1000);
