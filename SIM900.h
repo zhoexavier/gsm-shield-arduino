@@ -17,15 +17,10 @@ class SIMCOM900 : public virtual GSM
     int getCCI(char* cci);
 	int getIMEI(char* imei);
     int sendSMS(const char* to, const char* msg);
-    int attachGPRS(char* domain, char* dom1, char* dom2);
     boolean readSMS(char* msg, int msglength, char* number, int nlength);
     boolean readCall(char* number, int nlength);
     boolean call(char* number, unsigned int milliseconds);
-    int dettachGPRS();
-    int connectTCP(const char* server, int port);
-    int disconnectTCP();
-    int connectTCPServer(int port);
-    boolean connectedClient();
+
     virtual int read(char* result, int resultlength);
 	virtual uint8_t read();
     int readCellData(int &mcc, int &mnc, long &lac, long &cellid);
