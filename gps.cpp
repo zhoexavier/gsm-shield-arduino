@@ -1,4 +1,37 @@
 #include "gps.h"
+void GPSGSM::getBattInf(char *str_perc, char *str_vol){
+	char *p_char; 
+	char *p_char1;
+	//BCL
+	p_char = strchr((char *)(gsm.comm_buf),',');
+	p_char1 = p_char+1;  //we are on the first char of BCS
+	p_char = strchr((char *)(p_char), ',');
+	if (p_char != NULL) {
+          *p_char = 0; 
+    }
+	strcpy(str_perc, (char *)(p_char1));	
+	
+	//Voltage
+	p_char++;
+	p_char1 = strchr((char *)(p_char), ',');
+	if (p_char1 != NULL) {
+          *p_char1 = 0; 
+    }	
+	strcpy(str_vol, (char *)(p_char));	
+}
+
+void GPSGSM::getBattTVol(char *str_vol){
+	char *p_char; 
+	char *p_char1;
+	//BCL
+	p_char = strchr((char *)(gsm.comm_buf),':');
+	p_char1 = p_char+2;  //we are on the first char of BCS
+	p_char = strchr((char *)(p_char), ',');
+	if (p_char != NULL) {
+          *p_char = 0; 
+    }
+	strcpy(str_vol, (char *)(p_char1));	
+}
 
 char GPSGSM::attachGPS() 
 {
@@ -45,9 +78,6 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	p_char1 = p_char+1;  //we are on the first char of longitude
 	p_char = strchr((char *)(p_char), ',');
 	if (p_char != NULL) {
-          // finish the SMS text string 
-          // because string must be finished for right behaviour 
-          // of next strcpy() function
           *p_char = 0; 
     }
 	strcpy(str_long, (char *)(p_char1));
@@ -56,9 +86,6 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
-          // finish the SMS text string 
-          // because string must be finished for right behaviour 
-          // of next strcpy() function
           *p_char1 = 0; 
     }	
 	strcpy(str_lat, (char *)(p_char));
@@ -67,9 +94,6 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
-          // finish the SMS text string 
-          // because string must be finished for right behaviour 
-          // of next strcpy() function
           *p_char = 0; 
     }	
 	strcpy(str_alt, (char *)(p_char1));
@@ -78,9 +102,6 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
-          // finish the SMS text string 
-          // because string must be finished for right behaviour 
-          // of next strcpy() function
           *p_char1 = 0; 
     }	
 	strcpy(str_time, (char *)(p_char));	
@@ -89,9 +110,6 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
-          // finish the SMS text string 
-          // because string must be finished for right behaviour 
-          // of next strcpy() function
           *p_char = 0; 
     }	
 
@@ -99,9 +117,6 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
-          // finish the SMS text string 
-          // because string must be finished for right behaviour 
-          // of next strcpy() function
           *p_char1 = 0; 
     }	
 
@@ -109,9 +124,6 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
-          // finish the SMS text string 
-          // because string must be finished for right behaviour 
-          // of next strcpy() function
           *p_char = 0; 
     }		
 	strcpy(str_speed, (char *)(p_char1));	
