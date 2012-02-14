@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 22/01/2012.
+last modified 14/02/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -105,6 +105,7 @@ int GSM::begin(long baud_rate){
 			  
 			case 7:
 			  _cell.begin(115200);
+			  delay(500);
 			  break;
   
 			// if nothing else matches, do the default
@@ -160,8 +161,15 @@ int GSM::begin(long baud_rate){
 		return(1);
 
 	}
-	else
+	else{
+		//just to try to fix some problems with 115200 baudrate
+		_cell.begin(115200);
+		delay(1000);
+		_cell.print("AT+IPR=");
+		_cell.print(baud_rate);    
+		_cell.print("\r"); // send <CR>		
 		return(0);
+	}
 }
 
 

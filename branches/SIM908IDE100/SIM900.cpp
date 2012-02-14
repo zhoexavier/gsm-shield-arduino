@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 22/01/2012.
+last modified 14/02/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -21,7 +21,7 @@ based on QuectelM10 chip.
 #define _TCP_CONNECTION_TOUT_ 20
 #define _GSM_DATA_TOUT_ 10
 
-#define RESETPIN 7
+//#define RESETPIN 7
 
 SIMCOM900 gsm;
 SIMCOM900::SIMCOM900(){};
