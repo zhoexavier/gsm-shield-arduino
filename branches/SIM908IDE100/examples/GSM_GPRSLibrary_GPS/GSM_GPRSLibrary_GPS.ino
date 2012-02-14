@@ -23,9 +23,11 @@ char lat[10];
 char alt[10];
 char time[15];
 char vel[10];
+char msg1[5];
+char msg2[5];
 
 char stat;
-char inSerial[50];
+char inSerial[20];
 int i=0;
 boolean started=false;
 
@@ -96,8 +98,13 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("SIGNAL QUALITY");
-      gsm.SimpleWriteln("AT+CSQ");
+      Serial.println("BATTERY TEST 1");
+      gps.getBattInf(msg1,msg2);
+      Serial.println(msg1);
+      Serial.println(msg2);
+      Serial.println("BATTERY TEST 2");
+      gps.getBattTVol(msg1);
+      Serial.println(msg1);
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
