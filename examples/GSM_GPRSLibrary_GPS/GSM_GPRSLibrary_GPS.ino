@@ -40,6 +40,7 @@ void setup()
   //For http uses is raccomanded to use 4800 or slower.
   if (gsm.begin(2400)){
     Serial.println("\nstatus=READY");
+    gsm.forceON();	//To ensure that SIM908 is not only in charge mode
     started=true;  
   }
   else Serial.println("\nstatus=IDLE");

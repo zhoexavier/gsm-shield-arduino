@@ -1,7 +1,14 @@
 #include "gps.h"
-void GPSGSM::getBattInf(char *str_perc, char *str_vol){
+char GPSGSM::getBattInf(char *str_perc, char *str_vol){
+	char ret_val=0;
 	char *p_char; 
 	char *p_char1;
+
+	gsm.SimpleWrite("AT+CBC");
+	gsm.WaitResp(5000, 100, "OK");
+	if(gsm.IsStringReceived("+CBC"))
+		ret_val=1;
+		
 	//BCL
 	p_char = strchr((char *)(gsm.comm_buf),',');
 	p_char1 = p_char+1;  //we are on the first char of BCS
@@ -17,12 +24,20 @@ void GPSGSM::getBattInf(char *str_perc, char *str_vol){
 	if (p_char1 != NULL) {
           *p_char1 = 0; 
     }	
-	strcpy(str_vol, (char *)(p_char));	
+	strcpy(str_vol, (char *)(p_char));
+	return ret_val;
 }
 
-void GPSGSM::getBattTVol(char *str_vol){
+char GPSGSM::getBattTVol(char *str_vol){
 	char *p_char; 
 	char *p_char1;
+	char ret_val=0;
+	
+	gsm.SimpleWrite("AT+CBTE?");
+	gsm.WaitResp(5000, 100, "OK");
+	if(gsm.IsStringReceived("+CBTE"))
+		ret_val=1;	
+		
 	//BCL
 	p_char = strchr((char *)(gsm.comm_buf),':');
 	p_char1 = p_char+2;  //we are on the first char of BCS
@@ -31,6 +46,7 @@ void GPSGSM::getBattTVol(char *str_vol){
           *p_char = 0; 
     }
 	strcpy(str_vol, (char *)(p_char1));	
+	return ret_val;
 }
 
 char GPSGSM::attachGPS() 
@@ -53,6 +69,7 @@ char GPSGSM::getStat()
 {
 	char ret_val=0;
 	gsm.SimpleWrite("AT+CGPSSTATUS?");
+	gsm.WaitResp(5000, 100, "OK");
 	if(gsm.IsStringReceived("Unknown"))
 		ret_val=0;
 	else if(gsm.IsStringReceived("Not"))
@@ -70,6 +87,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	char *p_char; 
 	char *p_char1;
 	gsm.SimpleWrite("AT+CGPSINF=0");
+	gsm.WaitResp(5000, 100, "OK");
 	if(gsm.IsStringReceived("OK"))
 		ret_val=1;
 		
