@@ -186,7 +186,6 @@ class GSM
 
   public:
     WideTextFinder _tf;
-  
     inline void setStatus(GSM_st_e status) { _status = status; }  
     GSM();
     inline int getStatus(){   return _status; };

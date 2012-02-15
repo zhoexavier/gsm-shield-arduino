@@ -6,8 +6,8 @@
 class GPSGSM
 {
 	public:
-		void getBattInf(char *str_perc, char *str_vol);
-		void getBattTVol(char *str_vol);
+		char getBattInf(char *str_perc, char *str_vol);
+		char getBattTVol(char *str_vol);
 		char attachGPS();
 		char deattachGPS();
 		char getStat();

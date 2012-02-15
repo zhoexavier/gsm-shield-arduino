@@ -26,7 +26,37 @@ based on QuectelM10 chip.
 SIMCOM900 gsm;
 SIMCOM900::SIMCOM900(){};
 SIMCOM900::~SIMCOM900(){};
-  
+ 
+char SIMCOM900::forceON(){
+	char ret_val=0;
+	char *p_char; 
+	char *p_char1;
+	
+	SimpleWriteln("AT+CREG?");
+	WaitResp(5000, 100, "OK");
+	if(IsStringReceived("OK")){
+		ret_val=1;
+	}
+	//BCL
+	p_char = strchr((char *)(gsm.comm_buf),',');
+	p_char1 = p_char+1;  //we are on the first char of BCS
+	*(p_char1+2)=0;
+	p_char = strchr((char *)(p_char), ',');
+	if (p_char != NULL) {
+          *p_char = 0; 
+    }
+
+	if((*p_char1)=='4'){
+		digitalWrite(GSM_ON, HIGH);
+		delay(1200);
+		digitalWrite(GSM_ON, LOW);
+		delay(10000);
+		ret_val=2;
+	}
+
+	return ret_val;
+}
+
 int SIMCOM900::configandwait(char* pin)
 {
   int connCode;
