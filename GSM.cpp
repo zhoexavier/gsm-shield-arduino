@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 14/02/2012.
+last modified 15/03/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
