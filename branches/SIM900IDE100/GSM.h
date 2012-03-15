@@ -182,11 +182,11 @@ class GSM
 
   protected:
     SoftwareSerial _cell;
-    WideTextFinder _tf;
-    inline void setStatus(GSM_st_e status) { _status = status; }
     int isIP(const char* cadena);
 
   public:
+    WideTextFinder _tf;
+    inline void setStatus(GSM_st_e status) { _status = status; }  
     GSM();
     inline int getStatus(){   return _status; };
     virtual int begin(long baud_rate);   

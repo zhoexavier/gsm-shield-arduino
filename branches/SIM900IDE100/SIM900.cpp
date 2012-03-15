@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 22/01/2012.
+last modified 14/02/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -21,12 +21,42 @@ based on QuectelM10 chip.
 #define _TCP_CONNECTION_TOUT_ 20
 #define _GSM_DATA_TOUT_ 10
 
-#define RESETPIN 7
+//#define RESETPIN 7
 
 SIMCOM900 gsm;
 SIMCOM900::SIMCOM900(){};
 SIMCOM900::~SIMCOM900(){};
-  
+ 
+char SIMCOM900::forceON(){
+	char ret_val=0;
+	char *p_char; 
+	char *p_char1;
+	
+	SimpleWriteln("AT+CREG?");
+	WaitResp(5000, 100, "OK");
+	if(IsStringReceived("OK")){
+		ret_val=1;
+	}
+	//BCL
+	p_char = strchr((char *)(gsm.comm_buf),',');
+	p_char1 = p_char+1;  //we are on the first char of BCS
+	*(p_char1+2)=0;
+	p_char = strchr((char *)(p_char), ',');
+	if (p_char != NULL) {
+          *p_char = 0; 
+    }
+
+	if((*p_char1)=='4'){
+		digitalWrite(GSM_ON, HIGH);
+		delay(1200);
+		digitalWrite(GSM_ON, LOW);
+		delay(10000);
+		ret_val=2;
+	}
+
+	return ret_val;
+}
+
 int SIMCOM900::configandwait(char* pin)
 {
   int connCode;
@@ -62,308 +92,6 @@ int SIMCOM900::configandwait(char* pin)
   }
   return 0;
 }
-
-int SIMCOM900::sendSMS(const char* to, const char* msg)
-{
-
-  //Status = READY or ATTACHED.
-  /*
-  if((getStatus() != READY)&&(getStatus() != ATTACHED))
-    return 0;
-  */    
-
-  _tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
-
-  //_cell.flush();
-
-  //AT command to send a SMS. Destination telephone number 
-  _cell << "AT+CMGS=\"" << to << "\"" <<  _DEC(cr) << endl; // Establecemos el destinatario
-
-  //Expect for ">" character.
-  
-  switch(WaitResp(5000, 50, ">")){
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-
-  //SMS text.
-  _cell << msg << _DEC(ctrlz) << _DEC(cr) << "\"\r"; 
-   if (!_tf.find("OK")) 
-	return 0;
-  return 1;
-}
-
-int SIMCOM900::attachGPRS(char* domain, char* dom1, char* dom2)
-{
-   int i=0;
-   delay(5000);
-   
-  _tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
-  _cell << "AT+CIFSR\r";
-  if(WaitResp(5000, 50, "ERROR")!=RX_FINISHED_STR_RECV){
-  	#ifdef DEBUG_ON
-		Serial.println("DB:ALREADY HAVE AN IP");
-	#endif
-	_cell << "AT+CIPCLOSE\r";
-	WaitResp(5000, 50, "ERROR");
-	delay(2000);
-	_cell << "AT+CIPSERVER=0\r";
-	WaitResp(5000, 50, "ERROR");
-	return 1;
-  }
-  else{
-  _cell << "AT+CIPSHUT\r";
-	#ifdef DEBUG_ON
-		Serial.println("DB:STARTING NEW CONNECTION");
-	#endif
-   WaitResp(500, 50, "SHUT OK");
-
-  _cell << "AT+CSTT=\"";
-  _cell << domain;
-  _cell << "\",\"";
-  _cell << dom1;
-  _cell << "\",\"";
-  _cell << dom2;
-  _cell << "\"\r";
-  
-  switch(WaitResp(500, 50, "OK")){
-
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-	#ifdef DEBUG_ON
-		Serial.println("DB:APN OK");
-	#endif
-	 delay(1000);
-	  
-	_cell << "AT+CIICR\r";
-
-  switch(WaitResp(10000, 50, "OK")){
-	case RX_TMOUT_ERR: 
-		return 0; 
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-  	#ifdef DEBUG_ON
-		Serial.println("DB:CONNECTION OK");
-	#endif
-
-  delay(1000);
-
-
- _cell << "AT+CIFSR\r";
- if(WaitResp(5000, 50, "ERROR")!=RX_FINISHED_STR_RECV){
-	#ifdef DEBUG_ON
-		Serial.println("DB:ASSIGNED AN IP");
-	#endif
-	setStatus(ATTACHED);
-	return 1;
-}
-	#ifdef DEBUG_ON
-		Serial.println("DB:NO IP AFTER CONNECTION");
-	#endif
- return 0;
- }
-}
-
-int SIMCOM900::dettachGPRS()
-{
-  if (getStatus()==IDLE) return 0;
-   
-  _tf.setTimeout(_GSM_CONNECTION_TOUT_);
-
-  //_cell.flush();
-
-  //GPRS dettachment.
-  _cell << "AT+CGATT=0" <<  _DEC(cr) << endl;
-  
-  if(!_tf.find("OK")) 
-  {
-    setStatus(ERROR);
-    return 0;
-  }
-  delay(500);
-  
-  // Commented in initial trial code!!
-  //Stop IP stack.
-  //_cell << "AT+WIPCFG=0" <<  _DEC(cr) << endl;
-  //	if(!_tf.find("OK")) return 0;
-  //Close GPRS bearer.
-  //_cell << "AT+WIPBR=0,6" <<  _DEC(cr) << endl;
-
-  setStatus(READY);
-  return 1;
-}
-
-int SIMCOM900::connectTCP(const char* server, int port)
-{
-  _tf.setTimeout(_TCP_CONNECTION_TOUT_);
-
-  //Status = ATTACHED.
-  //if (getStatus()!=ATTACHED)
-    //return 0;
-
-  //_cell.flush();
-  
-  //Visit the remote TCP server.
-  _cell << "AT+CIPSTART=\"TCP\",\"" << server << "\"," << port <<  "\r";
-  
-  switch(WaitResp(1000, 200, "OK")){
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-  #ifdef DEBUG_ON
-	Serial.println("DB:RECVD CMD");
-  #endif	
-
-  switch(WaitResp(15000, 200, "OK")){
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-
-  #ifdef DEBUG_ON
-	Serial.println("DB:OK TCP");
-  #endif
-
-  delay(3000);
-  _cell << "AT+CIPSEND\r";
-  switch(WaitResp(5000, 200, ">")){
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-
-  #ifdef DEBUG_ON
-	Serial.println("DB:>");
-  #endif
-  delay(4000);
-  return 1;
-}
-
-int SIMCOM900::disconnectTCP()
-{
-  //Status = TCPCONNECTEDCLIENT or TCPCONNECTEDSERVER.
-  /*
-  if ((getStatus()!=TCPCONNECTEDCLIENT)&&(getStatus()!=TCPCONNECTEDSERVER))
-     return 0;
-  */
-  _tf.setTimeout(_GSM_CONNECTION_TOUT_);
-
-
-  //_cell.flush();
-
-  //Switch to AT mode.
-  //_cell << "+++" << endl;
-  
-  //delay(200);
-  
-  //Close TCP client and deact.
-  _cell << "AT+CIPCLOSE\r";
-
-  //If remote server close connection AT+QICLOSE generate ERROR
-  /*if(_tf.find("OK"))
-  {
-    if(getStatus()==TCPCONNECTEDCLIENT)
-      setStatus(ATTACHED);
-    else
-      setStatus(TCPSERVERWAIT);
-    return 1;
-  }
-  setStatus(ERROR);
-  
-  return 0;    */
-  if(getStatus()==TCPCONNECTEDCLIENT)
-      	setStatus(ATTACHED);
-   elsehttp://www.facebook.com/photo.php?fbid=2486533357849&set=a.2316317142550.2138694.1088100793&type=1&ref=nf
-        setStatus(TCPSERVERWAIT);   
-    return 1;
-}
-
-int SIMCOM900::connectTCPServer(int port)
-{
-/*
-  if (getStatus()!=ATTACHED)
-     return 0;
-*/
-  _tf.setTimeout(_GSM_CONNECTION_TOUT_);
-
-  //_cell.flush();
-
-  // Set port
-  _cell << "AT+CIPSERVER=1," << port << "\r";
-/*
-  switch(WaitResp(5000, 50, "OK")){
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-
-  switch(WaitResp(5000, 50, "SERVER")){ //Try SERVER OK
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }
-*/
-  //delay(200);  
-
-  return 1;
-
-}
-
-boolean SIMCOM900::connectedClient()
-{
-  /*
-  if (getStatus()!=TCPSERVERWAIT)
-     return 0;
-  */
-   _cell << "AT+CIPSTATUS" << "\r";
-  // Alternative: AT+QISTAT, although it may be necessary to call an AT 
-  // command every second,which is not wise
-  /*
-  switch(WaitResp(1000, 200, "OK")){
-	case RX_TMOUT_ERR: 
-		return 0;
-	break;
-	case RX_FINISHED_STR_NOT_RECV: 
-		return 0; 
-	break;
-  }*/
-  _tf.setTimeout(1);
-  if(_tf.find("CONNECT OK")) 
-  {
-    setStatus(TCPCONNECTEDSERVER);
-    return true;
-  }
-  else
-    return false;
- }
 
 int SIMCOM900::read(char* result, int resultlength)
 {

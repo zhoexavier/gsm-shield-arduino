@@ -39,7 +39,7 @@ void setup()
   if(started){
     //GPRS attach, put in order APN, username and password.
     //If no needed auth let them blank.
-    if (gsm.attachGPRS("internet.wind", "", ""))
+    if (inet.attachGPRS("internet.wind", "", ""))
       Serial.println("status=ATTACHED");
     else Serial.println("status=ERROR");
     delay(1000);
@@ -57,7 +57,7 @@ void setup()
     //as server on the assigned port.
     Serial.println(msg);
     delay(5000);
-    if (gsm.connectTCPServer(80))
+    if (inet.connectTCPServer(80))
       Serial.println("status=TCPSERVERWAIT");
     else Serial.println("ERROR in Server");
     lasttime=millis();
@@ -68,7 +68,7 @@ void setup()
 void loop(){
   if(started){
     //Check if there is an active connection.
-    if (gsm.connectedClient()){
+    if (inet.connectedClient()){
       //Read and print the last message received.
       gsm.read(msg, 50);
       Serial.println(msg);
