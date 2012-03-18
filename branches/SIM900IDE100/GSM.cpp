@@ -31,6 +31,8 @@ GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE){
 };
 
 int GSM::begin(long baud_rate){
+	pinMode(GSM_ON, OUTPUT);               
+	pinMode(GSM_RESET, OUTPUT);
 	int response=-1;
 	int cont=0;
 	boolean norep=false;
