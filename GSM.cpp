@@ -1,6 +1,6 @@
 /*
 This is a Beta version.
-last modified 15/03/2012.
+last modified 14/02/2012.
 
 This library is based on one developed by Arduino Labs
 and it is modified to preserve the compability
@@ -31,8 +31,6 @@ GSM::GSM():_cell(_GSM_TXPIN_,_GSM_RXPIN_),_tf(_cell, 10),_status(IDLE){
 };
 
 int GSM::begin(long baud_rate){
-	pinMode(GSM_ON, OUTPUT);               
-	pinMode(GSM_RESET, OUTPUT);
 	int response=-1;
 	int cont=0;
 	boolean norep=false;
@@ -107,6 +105,8 @@ int GSM::begin(long baud_rate){
 			  
 			case 7:
 			  _cell.begin(115200);
+			  _cell.print("AT+IPR=9600\r");
+			  _cell.begin(9600);
 			  delay(500);
 			  break;
   
