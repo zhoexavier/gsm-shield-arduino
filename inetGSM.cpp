@@ -187,9 +187,7 @@ int InetGSM::attachGPRS(char* domain, char* dom1, char* dom2)
 	return 1;
   }
   else{
-	    gsm.SimpleWriteln("AT+CIPSHUT");
 
-   gsm.WaitResp(500, 50, "SHUT OK");
 	#ifdef DEBUG_ON
 		Serial.println("DB:STARTING NEW CONNECTION");
 	#endif
@@ -206,17 +204,17 @@ int InetGSM::attachGPRS(char* domain, char* dom1, char* dom2)
 	break;
   }
 	#ifdef DEBUG_ON
-		Serial.println("DB:SHUT OK");
+		Serial.println("DB:SHUTTED OK");
 	#endif
 	 delay(1000);
 	 
-  gsm.SimpleWriteln("AT+CSTT");
-  gsm.SimpleWriteln(domain);
-  gsm.SimpleWriteln("\",\"");
-  gsm.SimpleWriteln(dom1);
-  gsm.SimpleWriteln("\",\"");
-  gsm.SimpleWriteln(dom2);
-  gsm.SimpleWriteln("\"\r");  
+  gsm.SimpleWrite("AT+CSTT=\"");
+  gsm.SimpleWrite(domain);
+  gsm.SimpleWrite("\",\"");
+  gsm.SimpleWrite(dom1);
+  gsm.SimpleWrite("\",\"");
+  gsm.SimpleWrite(dom2);
+  gsm.SimpleWrite("\"\r");  
 
   
   switch(gsm.WaitResp(500, 50, "OK")){
@@ -231,7 +229,7 @@ int InetGSM::attachGPRS(char* domain, char* dom1, char* dom2)
 	#ifdef DEBUG_ON
 		Serial.println("DB:APN OK");
 	#endif
-	 delay(1000);
+	 delay(5000);
 	  
 	gsm.SimpleWriteln("AT+CIICR");  
 
