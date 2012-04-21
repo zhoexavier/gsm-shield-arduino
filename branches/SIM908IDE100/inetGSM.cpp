@@ -193,7 +193,23 @@ int InetGSM::attachGPRS(char* domain, char* dom1, char* dom2)
 	#ifdef DEBUG_ON
 		Serial.println("DB:STARTING NEW CONNECTION");
 	#endif
-	
+  
+  gsm.SimpleWriteln("AT+CIPSHUT");
+  
+  switch(gsm.WaitResp(500, 50, "SHUT OK")){
+
+	case RX_TMOUT_ERR: 
+		return 0;
+	break;
+	case RX_FINISHED_STR_NOT_RECV: 
+		return 0; 
+	break;
+  }
+	#ifdef DEBUG_ON
+		Serial.println("DB:SHUT OK");
+	#endif
+	 delay(1000);
+	 
   gsm.SimpleWriteln("AT+CSTT");
   gsm.SimpleWriteln(domain);
   gsm.SimpleWriteln("\",\"");
