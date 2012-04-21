@@ -105,6 +105,8 @@ int GSM::begin(long baud_rate){
 			  
 			case 7:
 			  _cell.begin(115200);
+			  _cell.print("AT+IPR=9600\r");
+			  _cell.begin(9600);
 			  delay(500);
 			  break;
   
