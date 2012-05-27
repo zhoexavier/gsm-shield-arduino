@@ -69,7 +69,7 @@ martines[ dot ]marco[ at ]gmail[ dot ]com
 
 [3]	My shield doesn't work. Why?
 	
-	Check this step and then ask for support on the issues' page on google
+	Check this steps and then ask for support on the issues' page on google
 	code.
 
 	1) 	SIM900 and SIM908 require about 1 A during the hardest tasks.
