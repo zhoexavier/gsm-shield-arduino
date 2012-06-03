@@ -4,7 +4,7 @@ char GPSGSM::getBattInf(char *str_perc, char *str_vol){
 	char *p_char; 
 	char *p_char1;
 
-	gsm.SimpleWrite("AT+CBC");
+	gsm.SimpleWriteln("AT+CBC");
 	gsm.WaitResp(5000, 100, "OK");
 	if(gsm.IsStringReceived("+CBC"))
 		ret_val=1;
@@ -33,7 +33,7 @@ char GPSGSM::getBattTVol(char *str_vol){
 	char *p_char1;
 	char ret_val=0;
 	
-	gsm.SimpleWrite("AT+CBTE?");
+	gsm.SimpleWriteln("AT+CBTE?");
 	gsm.WaitResp(5000, 100, "OK");
 	if(gsm.IsStringReceived("+CBTE"))
 		ret_val=1;	
@@ -86,7 +86,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	char ret_val=0;
 	char *p_char; 
 	char *p_char1;
-	gsm.SimpleWrite("AT+CGPSINF=0");
+	gsm.SimpleWriteln("AT+CGPSINF=0");
 	gsm.WaitResp(5000, 100, "OK");
 	if(gsm.IsStringReceived("OK"))
 		ret_val=1;
