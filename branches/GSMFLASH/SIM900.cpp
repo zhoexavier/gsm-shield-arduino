@@ -25,7 +25,7 @@ char SIMCOM900::forceON(){
 	p_char = strchr((char *)(gsm.comm_buf),',');
 	p_char1 = p_char+1;  //we are on the first char of BCS
 	*(p_char1+2)=0;
-	p_char = strchr((char *)(p_char1), ',');
+	p_char = strchr((char *)(p_char), ',');
 	if (p_char != NULL) {
           *p_char = 0; 
     }
@@ -261,7 +261,7 @@ int SIMCOM900::getCCI(char *cci)
   
   //Read response from modem
   #ifdef UNO
-	_tf.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);
+	_tf.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21));
   #endif
   #ifdef MEGA
 	_cell.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);

@@ -1,8 +1,8 @@
 #ifndef GSM_H
 #define GSM_H
 
-#define UNO
-//#define MEGA
+//#define UNO
+#define MEGA
 
 #include <SoftwareSerial.h>
 #include <inttypes.h>
@@ -23,6 +23,7 @@
 #ifdef MEGA
 	#include "HWSerial.h"
 #endif
+
 // if defined - debug print is enabled with possibility to print out 
 // debug texts to the terminal program
 //#define DEBUG_PRINT
@@ -41,8 +42,8 @@
 
 
 // pins definition
-#define GSM_ON              8 // connect GSM Module turn ON to pin 77 
-#define GSM_RESET           9 // connect GSM Module RESET to pin 35
+#define GSM_ON              6 // connect GSM Module turn ON to pin 77 
+#define GSM_RESET           7 // connect GSM Module RESET to pin 35
 //#define DTMF_OUTPUT_ENABLE  71 // connect DTMF Output Enable not used
 #define DTMF_DATA_VALID     14 // connect DTMF Data Valid to pin 14
 #define DTMF_DATA0          72 // connect DTMF Data0 to pin 72

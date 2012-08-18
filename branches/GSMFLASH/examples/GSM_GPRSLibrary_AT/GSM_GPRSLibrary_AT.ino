@@ -1,9 +1,8 @@
 #include "SIM900.h"
 #include <SoftwareSerial.h>
-//#include "inetGSM.h"
+#include "inetGSM.h"
 //#include "sms.h"
 //#include "call.h"
-#include "gps.h"
 
 //To change pins for Software Serial, use the two lines in GSM.cpp.
 
@@ -13,21 +12,13 @@
 
 //Simple sketch to start a connection as client.
 
-//InetGSM inet;
+InetGSM inet;
 //CallGSM call;
 //SMSGSM sms;
-GPSGSM gps;
 
-char lon[10];
-char lat[10];
-char alt[10];
-char time[15];
-char vel[10];
-char msg1[5];
-char msg2[5];
-
-char stat;
-char inSerial[20];
+char msg[50];
+int numdata;
+char inSerial[50];
 int i=0;
 boolean started=false;
 
@@ -38,37 +29,34 @@ void setup()
   Serial.println("GSM Shield testing.");
   //Start configuration of shield with baudrate.
   //For http uses is raccomanded to use 4800 or slower.
-  if (gsm.begin(2400)){
+  if (gsm.begin(4800)){
     Serial.println("\nstatus=READY");
-    gsm.forceON();	//To ensure that SIM908 is not only in charge mode
     started=true;  
+    gsm.forceON();
   }
   else Serial.println("\nstatus=IDLE");
-  
   if(started){
-    //GPS attach
-    if (gps.attachGPS())
-      Serial.println("status=GPSREADY");
+    //GPRS attach, put in order APN, username and password.
+    //If no needed auth let them blank.
+    if (inet.attachGPRS("internet.wind", "", ""))
+      Serial.println("status=ATTACHED");
     else Serial.println("status=ERROR");
-	
-    delay(20000);	//Time for fixing
-    stat=gps.getStat();
-	if(stat==1)
-		Serial.println("NOT FIXED");
-	else if(stat==0)
-		Serial.println("GPS OFF");
-	else if(stat==2)
-		Serial.println("2D FIXED");
-	else if(stat==3)
-		Serial.println("3D FIXED");
-	delay(5000);
-	//Get data from GPS
-	gps.getPar(lon,lat,alt,time,vel);
-	Serial.println(lon);
-	Serial.println(lat);
-	Serial.println(alt);
-	Serial.println(time);
-	Serial.println(vel);
+    delay(1000);
+    
+    //Read IP address.
+    gsm.SimpleWriteln("AT+CIFSR");
+    delay(5000);
+    //Read until serial buffer is empty.
+    gsm.WhileSimpleRead();
+  
+    //TCP Client GET, send a GET request to the server and
+    //save the reply.
+    numdata=inet.httpGET("www.google.com", 80, "/", msg, 50);
+    //Print the results.
+    Serial.println("\nNumber of data received:");
+    Serial.println(numdata);  
+    Serial.println("\nData received:"); 
+    Serial.println(msg); 
   }
 };
 
@@ -99,26 +87,12 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-//      Serial.println("BATTERY TEST 1");
-//      gps.getBattInf(msg1,msg2);
-//      Serial.println(msg1);
-//      Serial.println(msg2);
-//      Serial.println("BATTERY TEST 2");
-//      gps.getBattTVol(msg1);
-//      Serial.println(msg1);
-        stat=gps.getStat();
-	if(stat==1)
-		Serial.println("NOT FIXED");
-	else if(stat==0)
-		Serial.println("GPS OFF");
-	else if(stat==2)
-		Serial.println("2D FIXED");
-	else if(stat==3)
-		Serial.println("3D FIXED");
+      Serial.println("SIGNAL QUALITY");
+      gsm.SimpleWriteln("AT+CSQ");
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
-      Serial.println(msg1);
+      Serial.println(msg);
     }
     else{
       Serial.println(inSerial);

@@ -12,7 +12,7 @@ char GPSGSM::getBattInf(char *str_perc, char *str_vol){
 	//BCL
 	p_char = strchr((char *)(gsm.comm_buf),',');
 	p_char1 = p_char+1;  //we are on the first char of BCS
-	p_char = strchr((char *)(p_char), ',');
+	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
           *p_char = 0; 
     }
@@ -20,7 +20,7 @@ char GPSGSM::getBattInf(char *str_perc, char *str_vol){
 	
 	//Voltage
 	p_char++;
-	p_char1 = strchr((char *)(p_char), ',');
+	p_char1 = strchr((char *)(p_char), '\r');
 	if (p_char1 != NULL) {
           *p_char1 = 0; 
     }	
@@ -41,7 +41,7 @@ char GPSGSM::getBattTVol(char *str_vol){
 	//BCL
 	p_char = strchr((char *)(gsm.comm_buf),':');
 	p_char1 = p_char+2;  //we are on the first char of BCS
-	p_char = strchr((char *)(p_char), ',');
+	p_char = strchr((char *)(p_char1), '\r');
 	if (p_char != NULL) {
           *p_char = 0; 
     }
@@ -67,16 +67,16 @@ char GPSGSM::deattachGPS()
 
 char GPSGSM::getStat() 
 {
-	char ret_val=0;
-	gsm.SimpleWrite("AT+CGPSSTATUS?");
+	char ret_val=-1;
+	gsm.SimpleWriteln("AT+CGPSSTATUS?");
 	gsm.WaitResp(5000, 100, "OK");
-	if(gsm.IsStringReceived("Unknown"))
+	if(gsm.IsStringReceived("Unknown")||gsm.IsStringReceived("unknown"))
 		ret_val=0;
 	else if(gsm.IsStringReceived("Not"))
 		ret_val=1;
-	else if(gsm.IsStringReceived("2D"))
+	else if(gsm.IsStringReceived("2D")||gsm.IsStringReceived("2d"))
 		ret_val=2;
-	else if(gsm.IsStringReceived("3D"))
+	else if(gsm.IsStringReceived("3D")||gsm.IsStringReceived("3d"))
 		ret_val=3;
 	return ret_val;
 }
@@ -94,7 +94,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	//longitude
 	p_char = strchr((char *)(gsm.comm_buf),',');
 	p_char1 = p_char+1;  //we are on the first char of longitude
-	p_char = strchr((char *)(p_char), ',');
+	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
           *p_char = 0; 
     }
