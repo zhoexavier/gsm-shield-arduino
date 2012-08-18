@@ -114,7 +114,7 @@ int GSM::begin(long baud_rate){
 			  
 			case 7:
 			  _cell.begin(115200);
-			  _cell.print("AT+IPR=9600\r");
+			  _cell.print(F("AT+IPR=9600\r"));
 			  _cell.begin(9600);
 			  delay(500);
 			  break;
@@ -137,7 +137,7 @@ int GSM::begin(long baud_rate){
 				#ifdef DEBUG_ON
 					Serial.println("DB:FOUND PREV BR");
 				#endif
-				_cell.print("AT+IPR=");
+				_cell.print(F("AT+IPR="));
 				_cell.print(baud_rate);    
 				_cell.print("\r"); // send <CR>
 				delay(500);
@@ -176,7 +176,7 @@ int GSM::begin(long baud_rate){
 		//just to try to fix some problems with 115200 baudrate
 		_cell.begin(115200);
 		delay(1000);
-		_cell.print("AT+IPR=");
+		_cell.print(F("AT+IPR="));
 		_cell.print(baud_rate);    
 		_cell.print("\r"); // send <CR>		
 		return(0);
@@ -215,9 +215,9 @@ void GSM::InitParam(byte group){
 		//if (CLS_FREE != GetCommLineStatus()) return;
 		SetCommLineStatus(CLS_ATCMD);
 		// Request calling line identification
-		SendATCmdWaitResp("AT+CLIP=1", 500, 50, "OK", 5);
+		SendATCmdWaitResp(F("AT+CLIP=1"), 500, 50, "OK", 5);
 		// Mobile Equipment Error Code
-		SendATCmdWaitResp("AT+CMEE=0", 500, 50, "OK", 5);
+		SendATCmdWaitResp(F("AT+CMEE=0"), 500, 50, "OK", 5);
 		// Echo canceller enabled 
 		//SendATCmdWaitResp("AT#SHFEC=1", 500, 50, "OK", 5);
 		// Ringer tone select (0 to 32)
@@ -226,7 +226,7 @@ void GSM::InitParam(byte group){
 		// more than 500msec. so 1000msec. is more safety
 		//SendATCmdWaitResp("AT#HFMICG=7", 1000, 50, "OK", 5);
 		// set the SMS mode to text 
-		SendATCmdWaitResp("AT+CMGF=1", 500, 50, "OK", 5);
+		SendATCmdWaitResp(F("AT+CMGF=1"), 500, 50, "OK", 5);
 		// Auto answer after first ring enabled
 		// auto answer is not used
 		//SendATCmdWaitResp("ATS0=1", 500, 50, "OK", 5);
@@ -242,8 +242,8 @@ void GSM::InitParam(byte group){
 		// init SMS storage
 		InitSMSMemory();
 		// select phonebook memory storage
-		SendATCmdWaitResp("AT+CPBS=\"SM\"", 1000, 50, "OK", 5);
-		SendATCmdWaitResp("AT+CIPSHUT", 500, 50, "SHUT OK", 5);
+		SendATCmdWaitResp(F("AT+CPBS=\"SM\""), 1000, 50, "OK", 5);
+		SendATCmdWaitResp(F("AT+CIPSHUT"), 500, 50, "SHUT OK", 5);
 		break;
 	}
 }
@@ -323,6 +323,50 @@ char GSM::SendATCmdWaitResp(char const *AT_cmd_string,
     
   }
 
+  return (ret_val);
+}
+
+
+/**********************************************************
+Method sends AT command and waits for response
+
+return: 
+      AT_RESP_ERR_NO_RESP = -1,   // no response received
+      AT_RESP_ERR_DIF_RESP = 0,   // response_string is different from the response
+      AT_RESP_OK = 1,             // response_string was included in the response
+**********************************************************/
+char GSM::SendATCmdWaitResp(const __FlashStringHelper *AT_cmd_string,
+                uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
+                char const *response_string,
+                byte no_of_attempts)
+{
+  byte status;
+  char ret_val = AT_RESP_ERR_NO_RESP;
+  byte i;
+
+  for (i = 0; i < no_of_attempts; i++) {
+    // delay 500 msec. before sending next repeated AT command 
+    // so if we have no_of_attempts=1 tmout will not occurred
+    if (i > 0) delay(500); 
+
+    _cell.println(AT_cmd_string);
+    status = WaitResp(start_comm_tmout, max_interchar_tmout); 
+    if (status == RX_FINISHED) {
+      // something was received but what was received?
+      // ---------------------------------------------
+      if(IsStringReceived(response_string)) {
+        ret_val = AT_RESP_OK;      
+        break;  // response is OK => finish
+      }
+      else ret_val = AT_RESP_ERR_DIF_RESP;
+    }
+    else {
+      // nothing was received
+      // --------------------
+      ret_val = AT_RESP_ERR_NO_RESP;
+    }
+    
+  }
 
   return (ret_val);
 }

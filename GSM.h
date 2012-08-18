@@ -17,7 +17,7 @@
 #define lf    10 //Ascii character for line feed.
 #define GSM_LIB_VERSION 308 // library version X.YY (e.g. 1.00)
 
-#define DEBUG_ON
+//#define DEBUG_ON
 
 
 #ifdef MEGA
@@ -216,6 +216,10 @@ class GSM
 	uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
 	char const *response_string,
 	byte no_of_attempts);
+	char SendATCmdWaitResp(const __FlashStringHelper *AT_cmd_string,
+                uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
+                char const *response_string,
+                byte no_of_attempts);	
 	void Echo(byte state);
 
 

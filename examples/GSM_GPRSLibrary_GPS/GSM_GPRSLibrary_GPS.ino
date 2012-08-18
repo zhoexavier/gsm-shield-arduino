@@ -48,7 +48,7 @@ void setup()
   if(started){
     //GPS attach
     if (gps.attachGPS())
-      Serial.println("status=GPSON");
+      Serial.println("status=GPSREADY");
     else Serial.println("status=ERROR");
 	
     delay(20000);	//Time for fixing
@@ -99,17 +99,26 @@ void serialhwread(){
     }
     //Send a saved AT command using serial port.
     if(!strcmp(inSerial,"TEST")){
-      Serial.println("BATTERY TEST 1");
-      gps.getBattInf(msg1,msg2);
-      Serial.println(msg1);
-      Serial.println(msg2);
-      Serial.println("BATTERY TEST 2");
-      gps.getBattTVol(msg1);
-      Serial.println(msg1);
+//      Serial.println("BATTERY TEST 1");
+//      gps.getBattInf(msg1,msg2);
+//      Serial.println(msg1);
+//      Serial.println(msg2);
+//      Serial.println("BATTERY TEST 2");
+//      gps.getBattTVol(msg1);
+//      Serial.println(msg1);
+        stat=gps.getStat();
+	if(stat==1)
+		Serial.println("NOT FIXED");
+	else if(stat==0)
+		Serial.println("GPS OFF");
+	else if(stat==2)
+		Serial.println("2D FIXED");
+	else if(stat==3)
+		Serial.println("3D FIXED");
     }
     //Read last message saved.
     if(!strcmp(inSerial,"MSG")){
-      Serial.println(lat);
+      Serial.println(msg1);
     }
     else{
       Serial.println(inSerial);

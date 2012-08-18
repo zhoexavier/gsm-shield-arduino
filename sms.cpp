@@ -40,7 +40,7 @@ char SMSGSM::SendSMS(char *number_str, char *message_str)
   for (i = 0; i < 1; i++) {
     // send  AT+CMGS="number_str"
     
-    gsm.SimpleWrite("AT+CMGS=\"");
+    gsm.SimpleWrite(F("AT+CMGS=\""));
     gsm.SimpleWrite(number_str);  
     gsm.SimpleWriteln("\"");
     
@@ -171,13 +171,13 @@ char SMSGSM::IsSMSPresent(byte required_status)
 
   switch (required_status) {
     case SMS_UNREAD:
-      gsm.SimpleWriteln("AT+CMGL=\"REC UNREAD\"");
+      gsm.SimpleWriteln(F("AT+CMGL=\"REC UNREAD\""));
       break;
     case SMS_READ:
-      gsm.SimpleWriteln("AT+CMGL=\"REC READ\"");
+      gsm.SimpleWriteln(F("AT+CMGL=\"REC READ\""));
       break;
     case SMS_ALL:
-      gsm.SimpleWriteln("AT+CMGL=\"ALL\"");
+      gsm.SimpleWriteln(F("AT+CMGL=\"ALL\""));
       break;
   }
 
@@ -296,7 +296,7 @@ char SMSGSM::GetSMS(byte position, char *phone_number, char *SMS_text, byte max_
   ret_val = GETSMS_NO_SMS; // still no SMS
   
   //send "AT+CMGR=X" - where X = position
-  gsm.SimpleWrite("AT+CMGR=");
+  gsm.SimpleWrite(F("AT+CMGR="));
   gsm.SimpleWriteln((int)position);  
 
   // 5000 msec. for initial comm tmout
@@ -539,7 +539,7 @@ char SMSGSM::DeleteSMS(byte position)
   ret_val = 0; // not deleted yet
   
   //send "AT+CMGD=XY" - where XY = position
-  gsm.SimpleWrite("AT+CMGD=");
+  gsm.SimpleWrite(F("AT+CMGD="));
   gsm.SimpleWriteln((int)position);  
 
 
