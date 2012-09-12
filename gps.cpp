@@ -100,7 +100,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
     }
 	strcpy(str_long, (char *)(p_char1));
 	
-	//latitude
+	// latitude
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
@@ -108,7 +108,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
     }	
 	strcpy(str_lat, (char *)(p_char));
 	
-	//altitude
+	// altitude
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
@@ -116,7 +116,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
     }	
 	strcpy(str_alt, (char *)(p_char1));
 	
-	//UTC time
+	// UTC time
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
@@ -124,26 +124,27 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
     }	
 	strcpy(str_time, (char *)(p_char));	
 
-	//TTFF
+	// TTFF
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
           *p_char = 0; 
     }	
 
-	//num
+	// num
 	p_char++;
 	p_char1 = strchr((char *)(p_char), ',');
 	if (p_char1 != NULL) {
           *p_char1 = 0; 
     }	
 
-	//speed
+	// speed
 	p_char1++;
 	p_char = strchr((char *)(p_char1), ',');
 	if (p_char != NULL) {
           *p_char = 0; 
     }		
 	strcpy(str_speed, (char *)(p_char1));	
+	
 	return ret_val;
 }

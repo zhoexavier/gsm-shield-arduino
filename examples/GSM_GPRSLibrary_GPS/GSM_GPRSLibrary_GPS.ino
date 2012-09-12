@@ -18,11 +18,11 @@
 //SMSGSM sms;
 GPSGSM gps;
 
-char lon[10];
-char lat[10];
-char alt[10];
-char time[15];
-char vel[10];
+char lon[15];
+char lat[15];
+char alt[15];
+char time[20];
+char vel[15];
 char msg1[5];
 char msg2[5];
 
