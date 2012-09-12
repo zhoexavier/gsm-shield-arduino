@@ -386,7 +386,7 @@ int InetGSM::disconnectTCP()
   return 0;    */
   if(gsm.getStatus()==gsm.TCPCONNECTEDCLIENT)
       	gsm.setStatus(gsm.ATTACHED);
-   elsehttp://www.facebook.com/photo.php?fbid=2486533357849&set=a.2316317142550.2138694.1088100793&type=1&ref=nf
+   else
         gsm.setStatus(gsm.TCPSERVERWAIT);   
     return 1;
 }
