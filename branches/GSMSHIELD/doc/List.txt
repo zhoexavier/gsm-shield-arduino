@@ -171,6 +171,13 @@ void Call(char *number_string);
 	
 void Call(int sim_position);
 	To call the contact saved on the specified SIM position.
+
+void SendDTMF(char *number_string, int time);
+	Send a combination of DTMF stymbols separated by commas.
+	But a single character does not require quotes.
+	Time indicates the duration in seconds of each sound.
+	An example:
+		call.SendDTMF("1,2,3,4",1);
 		
 ***************************************************
 GPRS FUNCTIONS in InetGSM class.

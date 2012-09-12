@@ -234,7 +234,7 @@ void CallGSM::PickUp(void)
 {
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWriteln("ATA");
+  gsm.SimpleWriteln(F("ATA"));
   gsm.SetCommLineStatus(CLS_FREE);
 }
 
@@ -247,7 +247,7 @@ void CallGSM::HangUp(void)
 {
   //if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWriteln("ATH");
+  gsm.SimpleWriteln(F("ATH"));
   gsm.SetCommLineStatus(CLS_FREE);
 }
 
@@ -263,9 +263,9 @@ void CallGSM::Call(char *number_string)
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   // ATDxxxxxx;<CR>
-  gsm.SimpleWrite("ATD");
+  gsm.SimpleWrite(F("ATD"));
   gsm.SimpleWrite(number_string);    
-  gsm.SimpleWriteln(";");
+  gsm.SimpleWriteln(F(";"));
   // 10 sec. for initial comm tmout
   // 50 msec. for inter character timeout
   gsm.WaitResp(10000, 50);
@@ -283,13 +283,29 @@ void CallGSM::Call(int sim_position)
   if (CLS_FREE != gsm.GetCommLineStatus()) return;
   gsm.SetCommLineStatus(CLS_ATCMD);
   // ATD>"SM" 1;<CR>
-  gsm.SimpleWrite("ATD>\"SM\" ");
+  gsm.SimpleWrite(F("ATD>\"SM\" "));
   gsm.SimpleWrite(sim_position);
-  gsm.SimpleWriteln(";");
+  gsm.SimpleWriteln(F(";"));
 
   // 10 sec. for initial comm tmout
   // 50 msec. for inter character timeout
   gsm.WaitResp(10000, 50);
 
+  gsm.SetCommLineStatus(CLS_FREE);
+}
+
+void CallGSM::SendDTMF(char *number_string, int time)
+{
+  if (CLS_FREE != gsm.GetCommLineStatus()) return;
+  gsm.SetCommLineStatus(CLS_ATCMD);
+
+  gsm.SimpleWrite(F("AT+VTD="));
+  gsm.SimpleWriteln(time);
+  gsm.WaitResp(5000, 100, "OK");
+
+  gsm.SimpleWrite(F("AT+VTS=\""));
+  gsm.SimpleWrite(number_string);
+  gsm.SimpleWriteln(F("\""));
+  
   gsm.SetCommLineStatus(CLS_FREE);
 }
