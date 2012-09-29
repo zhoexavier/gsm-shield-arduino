@@ -133,23 +133,64 @@ int SIMCOM900::read(char* result, int resultlength)
 boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 {
   long index;
+  char *p_char; 
+  char *p_char1;
+
   /*
   if (getStatus()==IDLE)
     return false;
   */
-  //_tf.setTimeout(_GSM_DATA_TOUT_);
+  _tf.setTimeout(_GSM_DATA_TOUT_);
   //_cell.flush();
   SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
-  if(gsm.WaitResp(5000, 50, "+CMGL")!=RX_FINISHED_STR_RECV)
-  //if(_tf.find("+CMGL: "))
+  
+  //gsm.WaitResp(5000, 100, "OK");
+  //if(gsm.IsStringReceived("+CMGL"))
+  if(_tf.find("+CMGL: "))
   {
-    //index=_tf.getValue();
-	index=_cell.read();
+	Serial.println("TEST");
+	/*
+	//index
+	p_char = strchr((char *)(gsm.comm_buf),':');
+	p_char1 = p_char+2;  //we are on the first char of string
+	p_char = strchr((char *)(p_char1), ',');
+	if (p_char != NULL) {
+          *p_char = 0; 
+    }
+	//strcpy(msg, (char *)(p_char1));	
+	
+	// rec unread
+	p_char++;
+	p_char1 = strchr((char *)(p_char), ',');
+	if (p_char1 != NULL) {
+          *p_char1 = 0; 
+    }	
+	
+	// number
+	p_char1++;
+	p_char1++;
+	p_char = strchr((char *)(p_char1), '\"');
+	if (p_char != NULL) {
+          *p_char = 0; 
+    }	
+	strcpy(number, (char *)(p_char1));
+	
+	// UTC time
+	p_char = strchr((char *)(p_char), '\n');
+	p_char1 = strchr((char *)(p_char), '\n');
+	if (p_char1 != NULL) {
+          *p_char1 = 0; 
+    }	
+	strcpy(msg, (char *)(p_char));	
+	*/
+	
+    index=_tf.getValue();
+	//index=_cell.read();
 	#ifdef UNO
-		_tf.getString("\"+", "\"", number, nlength);
+		_tf.getString("\",\"", "\"", number, nlength);
 	#endif
 	#ifdef MEGA
-		_cell.getString("\"+", "\"", number, nlength);
+		_cell.getString("\",\"", "\"", number, nlength);
 	#endif
 	#ifdef UNO
 		_tf.getString("\n", "\nOK", msg, msglength);
@@ -159,6 +200,8 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 	#endif
     SimpleWrite(F("AT+CMGD="));
 	SimpleWriteln(index);
+	// Serial.print("VAL= ");
+	// Serial.println(index);
     gsm.WaitResp(5000, 50, "OK"); 
     return true;
   };
