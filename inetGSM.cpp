@@ -93,7 +93,8 @@ int InetGSM::httpPOST(const char* server, int port, const char* path, const char
   gsm.SimpleWrite("\n");
   gsm.SimpleWrite("User-Agent: Arduino\n");
   gsm.SimpleWrite("Content-Length: ");
-  itoa(strlen(parameters),itoaBuffer,10);  
+  itoa(strlen(parameters),itoaBuffer,10);
+  gsm.SimpleWrite(itoaBuffer);
   gsm.SimpleWrite("\n\n");
   gsm.SimpleWrite(parameters);
   gsm.SimpleWrite("\n\n");
