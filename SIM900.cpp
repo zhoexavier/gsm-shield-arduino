@@ -140,13 +140,13 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
   if (getStatus()==IDLE)
     return false;
   */
-  _tf.setTimeout(_GSM_DATA_TOUT_);
+  #ifdef UNO
+	_tf.setTimeout(_GSM_DATA_TOUT_);
+  #endif
   //_cell.flush();
   SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
-  
-  //gsm.WaitResp(5000, 100, "OK");
-  //if(gsm.IsStringReceived("+CMGL"))
-  if(_tf.find("+CMGL: "))
+  if(gsm.WaitResp(5000, 50, "+CMGL")!=RX_FINISHED_STR_RECV)
+  //if(_tf.find("+CMGL: "))
   {
 	Serial.println("TEST");
 	/*
@@ -183,9 +183,12 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
     }	
 	strcpy(msg, (char *)(p_char));	
 	*/
-	
+	#ifdef UNO
     index=_tf.getValue();
+	#endif
+	#ifdef MEGA
 	//index=_cell.read();
+	#endif
 	#ifdef UNO
 		_tf.getString("\",\"", "\"", number, nlength);
 	#endif
