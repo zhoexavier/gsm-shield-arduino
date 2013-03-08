@@ -185,7 +185,12 @@ byte CallGSM::CallStatusWithAuth(char *phone_number,
       if (p_char != NULL) {
         *p_char = 0; // end of string
         strcpy(phone_number, (char *)(p_char1));
+		Serial.print("ATTESO: ");
+		Serial.println(phone_number);
       }
+	  else
+		//Serial.println(gsm.comm_buf);
+		Serial.println("NULL");
       
       if ( (ret_val == CALL_INCOM_VOICE_NOT_AUTH) 
            || (ret_val == CALL_INCOM_DATA_NOT_AUTH)) {
@@ -246,9 +251,9 @@ return:
 void CallGSM::HangUp(void)
 {
   //if (CLS_FREE != gsm.GetCommLineStatus()) return;
-  gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWriteln(F("ATH"));
-  gsm.SetCommLineStatus(CLS_FREE);
+  //gsm.SetCommLineStatus(CLS_ATCMD);
+  gsm.SendATCmdWaitResp("ATH", 500, 100, "OK", 5);
+  //gsm.SetCommLineStatus(CLS_FREE);
 }
 
 /**********************************************************
@@ -301,11 +306,12 @@ void CallGSM::SendDTMF(char *number_string, int time)
 
   gsm.SimpleWrite(F("AT+VTD="));
   gsm.SimpleWriteln(time);
-  gsm.WaitResp(5000, 100, "OK");
+  gsm.WaitResp(1000, 100, "OK");
 
   gsm.SimpleWrite(F("AT+VTS=\""));
   gsm.SimpleWrite(number_string);
   gsm.SimpleWriteln(F("\""));
   
+  gsm.WaitResp(5000, 100, "OK");
   gsm.SetCommLineStatus(CLS_FREE);
 }

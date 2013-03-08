@@ -81,24 +81,16 @@ int SIMCOM900::configandwait(char* pin)
 
 int SIMCOM900::read(char* result, int resultlength)
 {
-  // Or maybe do it with AT+QIRD
-
-  int charget;
-  //_tf.setTimeout(3);
-  // Not well. This way we read whatever comes in one second. If a CLOSED 
-  // comes, we have spent a lot of time
-    //charget=_tf.getString("",'\0',result, resultlength);
-    //charget=_tf.getString("","",result, resultlength);
-  /*if(strtok(result, "CLOSED")) // whatever chain the Q10 returns...
-  {
-    // TODO: use strtok to delete from the chain everything from CLOSED
-    if(getStatus()==TCPCONNECTEDCLIENT)
-      setStatus(ATTACHED);
-    else
-      setStatus(TCPSERVERWAIT);
-  }  */
-  
-  return charget;
+	char temp;
+	int i=0;
+	for(i=0; i<resultlength;i++){
+		temp=gsm.read();
+		if(temp>0){
+			Serial.print(temp);
+			result[i]=temp;
+		}
+	}
+  return i;
 }
 
  int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
@@ -148,7 +140,6 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
   if(gsm.WaitResp(5000, 50, "+CMGL")!=RX_FINISHED_STR_RECV)
   //if(_tf.find("+CMGL: "))
   {
-	Serial.println("TEST");
 	/*
 	//index
 	p_char = strchr((char *)(gsm.comm_buf),':');
@@ -764,8 +755,9 @@ char GSM::GetPhoneNumber(byte position, char *phone_number)
 
       // response in case there is not phone number:
       // <CR><LF>OK<CR><LF>
-      p_char = strchr((char *)(comm_buf),'"');
+      p_char = strstr((char *)(comm_buf),",\"");
       if (p_char != NULL) {
+		p_char++;
         p_char++;       // we are on the first phone number character
         // find out '"' as finish character of phone number string
         p_char1 = strchr((char *)(p_char),'"');
@@ -947,6 +939,11 @@ char GSM::ComparePhoneNumber(byte position, char *phone_number)
   ret_val = 0; // numbers are not the same so far
   if (position == 0) return (-3);
   if (1 == GetPhoneNumber(position, sim_phone_number)) {
+  Serial.print("CHIAMANTE ");
+  Serial.println(phone_number);
+  Serial.print("SALVATO ");
+  Serial.println(sim_phone_number);
+  
     // there is a valid number at the spec. SIM position
     // -------------------------------------------------
     if (0 == strcmp(phone_number, sim_phone_number)) {
