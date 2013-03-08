@@ -77,6 +77,50 @@ int GSM::begin(long baud_rate){
 		turnedON=true;
 	}
 	if(cont==3&&norep){
+		Serial.println("Trying to force the baud-rate to 9600\n");
+		for (int i=0;i<8;i++){
+		switch (i) {
+			case 0:
+			  _cell.begin(1200);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			  
+			case 1:
+			  _cell.begin(2400);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			  
+			case 2:
+			  _cell.begin(4800);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			  
+			case 3:
+			  _cell.begin(9600);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			   
+			case 4:
+			  _cell.begin(19200);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			  
+			case 5:
+			  _cell.begin(38400);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			  
+			case 6:
+			  _cell.begin(57600);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			  
+			case 7:
+			  _cell.begin(115200);
+			  _cell.print(F("AT+IPR=9600\r"));
+			  break;
+			}	
+		}
 		Serial.println("ERROR: SIM900 doesn't answer. Check power and serial pins in GSM.cpp");
 		return 0;
 	}
@@ -86,8 +130,12 @@ int GSM::begin(long baud_rate){
 		#ifdef DEBUG_ON
 			Serial.println("DB:DIFF RESP");
 		#endif
-		for (int i=1;i<8;i++){
+		for (int i=0;i<8;i++){
 			switch (i) {
+			case 0:
+			  _cell.begin(1200);
+			  break;
+			  
 			case 1:
 			  _cell.begin(2400);
 			  break;

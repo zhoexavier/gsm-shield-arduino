@@ -142,7 +142,7 @@ return:
         -----------
         0 - there is no SMS with specified status
         1..20 - position where SMS is stored 
-                (suitable for the function GetGSM())
+                (suitable for the function GetSMS())
 
 
 an example of use:
@@ -154,7 +154,7 @@ an example of use:
         position = gsm.IsSMSPresent(SMS_UNREAD);
         if (position) {
           // read new SMS
-          gsm.GetGSM(position, phone_num, sms_text, 100);
+          gsm.GetSMS(position, phone_num, sms_text, 100);
           // now we have phone number string in phone_num
           // and SMS text in sms_text
         }
@@ -273,7 +273,7 @@ an example of usage:
         position = gsm.IsSMSPresent(SMS_UNREAD);
         if (position) {
           // there is new SMS => read it
-          gsm.GetGSM(position, phone_num, sms_text, 100);
+          gsm.GetSMS(position, phone_num, sms_text, 100);
           #ifdef DEBUG_PRINT
             gsm.DebugPrint("DEBUG SMS phone number: ", 0);
             gsm.DebugPrint(phone_num, 0);
