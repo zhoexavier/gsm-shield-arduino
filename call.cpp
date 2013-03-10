@@ -38,17 +38,17 @@ byte CallGSM::CallStatus(void)
     // <CR><LF>+CPAS: 3<CR><LF> <CR><LF>OK<CR><LF> - NO CALL
     // call in progress
     // <CR><LF>+CPAS: 4<CR><LF> <CR><LF>OK<CR><LF> - NO CALL
-    if(gsm.IsStringReceived("0")) { 
+    if(gsm.IsStringReceived("+CPAS: 0")) { 
       // ready - there is no call
       // ------------------------
       ret_val = CALL_NONE;
     }
-    else if(gsm.IsStringReceived("3")) { 
+    else if(gsm.IsStringReceived("+CPAS: 3")) { 
       // incoming call
       // --------------
       ret_val = CALL_INCOM_VOICE;
     }
-    else if(gsm.IsStringReceived("4")) { 
+    else if(gsm.IsStringReceived("+CPAS: 4")) { 
       // active call
       // -----------
       ret_val = CALL_ACTIVE_VOICE;
