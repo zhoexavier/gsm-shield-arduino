@@ -441,14 +441,15 @@ int InetGSM::connectTCP(const char* server, int port)
   #ifdef DEBUG_ON
 	Serial.println("DB:RECVD CMD");
   #endif	
-
-  switch(gsm.WaitResp(15000, 200, "OK")){
+  if (!gsm.IsStringReceived("CONNECT OK")) {
+    switch(gsm.WaitResp(15000, 200, "OK")) {
 	case RX_TMOUT_ERR: 
 		return 0;
 	break;
 	case RX_FINISHED_STR_NOT_RECV: 
 		return 0; 
 	break;
+    }
   }
 
   #ifdef DEBUG_ON
