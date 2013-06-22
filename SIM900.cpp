@@ -124,6 +124,7 @@ int SIMCOM900::read(char* result, int resultlength)
 
 boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 {
+  Serial.println(F("This method is deprecated! Please use GetSMS in the SMS class."));
   long index;
   char *p_char; 
   char *p_char1;
