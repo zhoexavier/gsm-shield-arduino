@@ -21,7 +21,7 @@
 		return Serial1.overflow();
 	}
 	*/
-	void HWSerial::begin(int baud_rate){
+	void HWSerial::begin(long baud_rate){
 		Serial1.begin(baud_rate);
 	}
 	
