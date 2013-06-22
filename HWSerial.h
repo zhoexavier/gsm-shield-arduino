@@ -26,7 +26,7 @@ class HWSerial
 	bool overflow();
 	*/
 	int peek();
-	virtual void begin(int baud_rate);
+	virtual void begin(long baud_rate);
 	
 	virtual size_t write(uint8_t byte);
 	size_t write(const char *str) { return write((const uint8_t *)str, strlen(str)); }
