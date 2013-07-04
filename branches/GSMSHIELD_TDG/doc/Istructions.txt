@@ -1,9 +1,11 @@
 ***************************************************
-GSM/GPRS/GPS Shield of Futura/Open-electronics
+TiDiGino of Futura/Open-electronics
 
 http://www.open-electronics.org/
 
 http://store.open-electronics.org/index.php?route=common/home
+
+http://www.gsmlib.org
 
 ***************************************************
 
