@@ -148,3 +148,51 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
 	
 	return ret_val;
 }
+
+void parseTime(char *field, int *time) {
+  ////////////////Time////////////
+  char tmp[4];
+  tmp[2]=0; // Init tmp and null terminate
+  tmp[0] = field[8];
+  tmp[1] = field[9];
+  time[0] = atoi(tmp); // Hours
+  tmp[0] = field[10];
+  tmp[1] = field[11];
+  time[1] = atoi(tmp); // Minutes
+  tmp[0] = field[12];
+  tmp[1] = field[13];
+  time[2] = atoi(tmp); // Seconds
+  /////////////Date///////////////
+  tmp[0] = field[0];
+  tmp[1] = field[1];
+  tmp[2] = field[2];
+  tmp[3] = field[3];
+  tmp[4]=0; // Init tmp and null terminate
+  time[3] = atoi(tmp); // year
+  tmp[0] = field[4];
+  tmp[1] = field[5];
+  tmp[2]=0; // Init tmp and null terminate
+  time[4] = atoi(tmp); // month
+  tmp[0] = field[6];
+  tmp[1] = field[7];
+  tmp[2]=0; // Init tmp and null terminate
+  time[5] = atoi(tmp); // day
+}
+
+// Read the latitude in decimal format from a GGA string
+double convertLat(void) {
+  double latitude = atof(latString);                                    // convert to a double (precise)
+  int deg = (int) latitude / 100;                               // extract the number of degrees
+  double min = latitude - (100 * deg);                  // work out the number of minutes
+  latitude = deg + (double) min/60.0;                   // convert to decimal format
+  return latitude;
+}
+
+// Read the longitude in decimal format from a GGA string
+double convertLong(void) {
+  double longitude = atof(longString);                                  // convert to a double
+  int deg = (int) longitude / 100;                              // extract the number of degrees
+  double min = longitude - (100 * deg);                 // work out the number of minutes
+  longitude = deg + (double) min/60.00;                 // convert to decimal format
+  return longitude;
+}
