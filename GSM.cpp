@@ -41,9 +41,10 @@ GSM::GSM(){
 
 int GSM::begin(long baud_rate){
 	#ifdef UNO
-		if (baud_rate==115200);
-		Serial.println("Don't use baudrate 115200 with Software Serial.\nAutomatically changed at 9600.");
-		baud_rate=9600;
+		if (baud_rate==115200){
+			Serial.println("Don't use baudrate 115200 with Software Serial.\nAutomatically changed at 9600.");
+			baud_rate=9600;
+		}
 	#endif
 	int response=-1;
 	int cont=0;
