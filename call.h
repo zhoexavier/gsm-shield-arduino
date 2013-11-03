@@ -19,6 +19,10 @@ class CallGSM
     // makes a call to the number stored at the specified SIM position
     void Call(int sim_position);
 	void SendDTMF(char *number_string, int time);
+	
+    void SetDTMF(int DTMF_status);
+	char DetDTMF();
+
 };
 
 #endif

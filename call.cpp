@@ -237,10 +237,11 @@ return:
 **********************************************************/
 void CallGSM::PickUp(void)
 {
-  if (CLS_FREE != gsm.GetCommLineStatus()) return;
-  gsm.SetCommLineStatus(CLS_ATCMD);
-  gsm.SimpleWriteln(F("ATA"));
-  gsm.SetCommLineStatus(CLS_FREE);
+  //if (CLS_FREE != gsm.GetCommLineStatus()) return;
+  //gsm.SetCommLineStatus(CLS_ATCMD);
+  gsm.SendATCmdWaitResp("ATA", 10, 10, "OK", 3);
+  gsm.SimpleWriteln("ATA");
+  //gsm.SetCommLineStatus(CLS_FREE);
 }
 
 /**********************************************************
@@ -314,4 +315,32 @@ void CallGSM::SendDTMF(char *number_string, int time)
   
   gsm.WaitResp(5000, 100, "OK");
   gsm.SetCommLineStatus(CLS_FREE);
+}
+
+void CallGSM::SetDTMF(int DTMF_status)
+{
+	if(DTMF_status==1)
+		gsm.SendATCmdWaitResp("AT+DDET=1", 500, 50, "OK", 5);
+	else
+		gsm.SendATCmdWaitResp("AT+DDET=0", 500, 50, "OK", 5);
+}
+
+
+char CallGSM::DetDTMF()
+{
+	char *p_char; 
+	char *p_char1;
+	char dtmf_char='-';
+	gsm.WaitResp(1000, 500);
+	{
+		//Serial.print("BUF: ");
+		//Serial.println((char *)gsm.comm_buf);
+		//Serial.println("end");
+		p_char = strstr((char *)(gsm.comm_buf),"+DTMF:");
+		if (p_char != NULL) {
+			p_char1 = p_char+6;  //we are on the first char of BCS
+			dtmf_char = *p_char1;
+		}
+	}
+	return dtmf_char;
 }
