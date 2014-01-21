@@ -180,7 +180,7 @@ void parseTime(char *field, int *time) {
 }
 
 // Read the latitude in decimal format from a GGA string
-double convertLat(void) {
+double convertLat(char* latString) {
   double latitude = atof(latString);                                    // convert to a double (precise)
   int deg = (int) latitude / 100;                               // extract the number of degrees
   double min = latitude - (100 * deg);                  // work out the number of minutes
@@ -189,7 +189,7 @@ double convertLat(void) {
 }
 
 // Read the longitude in decimal format from a GGA string
-double convertLong(void) {
+double convertLong(char* longString) {
   double longitude = atof(longString);                                  // convert to a double
   int deg = (int) longitude / 100;                              // extract the number of degrees
   double min = longitude - (100 * deg);                 // work out the number of minutes
